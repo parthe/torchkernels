@@ -2,14 +2,16 @@ import primitives
 
 def gaussian(samples, centers, bandwidth=1., M=None):
     '''Gaussian kernel.
+    If `M` is not None, then Mahalanobis metric is applied.
 
     Args:
-        samples: of shape (n_sample, n_feature).
-        centers: of shape (n_center, n_feature).
+        samples: of shape (n, d).
+        centers: of shape (p, d).
         bandwidth: kernel bandwidth.
+        M: of shape (d, d). positive semi-definite matrix for Mahalanobis norm.
 
     Returns:
-        kernel matrix of shape (n_sample, n_center).
+        kernel matrix of shape (n, p).
     '''
     assert bandwidth > 0
     kernel_mat = primitives.euclidean(samples, centers, squared=True, M=M)
