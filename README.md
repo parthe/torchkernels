@@ -16,8 +16,8 @@ with Python 3.9 and `PyTorch >= 1.13`
 import torch
 from kernels import laplacian
 
-n1 = 1000 # number of samples
-n2 = 1000 # number of samples
+n = 1000 # number of samples
+p = 1000 # number of centers
 d = 100  # dimensions
 
 if torch.cuda.is_available():
@@ -27,8 +27,8 @@ else:
     DEVICE = torch.device("cpu")
     DEV_MEM = 8 # RAM available for computing
 
-X, Z = torch.randn(n, d, device=DEV), torch.randn(n, d, device=DEV)
+X, Z = torch.randn(n, d, device=DEVICE), torch.randn(p, d, device=DEVICE)
 
-kernel_matrix = laplacian(x, y, bandwidth=1.)
+kernel_matrix = laplacian(X, Z, bandwidth=1.)
 print('Laplacian test complete!')
 ```
