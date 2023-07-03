@@ -1,12 +1,11 @@
 from setuptools import setup, find_packages
-import kernels
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name='kernels',
-    version=kernels.__version__,
+    version=0.1,
     author='Parthe Pandit',
     author_email='parthe1292@gmail.com',
     description='Fast solver for Kernel Regression using GPUs with linear space and time complexity',
