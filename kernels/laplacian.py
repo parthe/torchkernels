@@ -1,4 +1,4 @@
-import .primitives
+import primitives
 
 def laplacian(samples, centers, bandwidth):
     '''Laplacian kernel.
