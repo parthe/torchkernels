@@ -1,3 +1,5 @@
+from .eucledian import eucledian
+
 def gaussian(samples, centers, bandwidth):
     '''Gaussian kernel.
 
