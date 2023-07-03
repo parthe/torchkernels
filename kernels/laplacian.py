@@ -1,4 +1,4 @@
-import primitives
+from .primitives import euclidean
 
 def laplacian(samples, centers, bandwidth=1., M=None):
     '''Laplacian kernel.
@@ -14,7 +14,7 @@ def laplacian(samples, centers, bandwidth=1., M=None):
         kernel matrix of shape (n, p).
     '''
     assert bandwidth > 0
-    kernel_mat = primitives.euclidean(samples, centers, squared=False, M=M)
+    kernel_mat = euclidean(samples, centers, squared=False, M=M)
     kernel_mat.clamp_(min=0)
     gamma = 1. / bandwidth
     kernel_mat.mul_(-gamma)
