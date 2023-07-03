@@ -1,3 +1,5 @@
+from .eucledian import eucledian
+
 def laplacian(samples, centers, bandwidth):
     '''Laplacian kernel.
 
