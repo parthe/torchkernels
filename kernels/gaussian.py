@@ -1,4 +1,4 @@
-from .eucledian import eucledian
+import primitives
 
 def gaussian(samples, centers, bandwidth):
     '''Gaussian kernel.
@@ -12,7 +12,7 @@ def gaussian(samples, centers, bandwidth):
         kernel matrix of shape (n_sample, n_center).
     '''
     assert bandwidth > 0
-    kernel_mat = euclidean(samples, centers)
+    kernel_mat = primitives.euclidean(samples, centers)
     kernel_mat.clamp_(min=0)
     gamma = 1. / (2 * bandwidth ** 2)
     kernel_mat.mul_(-gamma)
