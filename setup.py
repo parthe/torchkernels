@@ -8,7 +8,7 @@ setup(
     version=0.1,
     author='Parthe Pandit',
     author_email='parthe1292@gmail.com',
-    description='Fast solver for Kernel Regression using GPUs with linear space and time complexity',
+    description='Primitives for Kernel Methods',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/parthe/pytorch_kernel_implementations/',
