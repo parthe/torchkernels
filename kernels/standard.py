@@ -34,3 +34,9 @@ def exp_power(samples, centers, bandwidth=1., power=1., M=None):
     kernel_mat.mul_(-1. / bandwidth)
     kernel_mat.exp_()
     return kernel_mat
+
+# Aliases
+exponential_power = exp_power
+dispersal = exp_power
+rbf = gaussian
+laplace = laplacian
