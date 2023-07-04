@@ -53,4 +53,4 @@ def euclidean(samples, centers, squared=False, M=None):
     
     distances2 = samples_norm2.view(-1, 1) + centers_norm2 - 2 * inner_product(samples, centers, M=M)
 
-    return distances2 if squared else distances2.clamp_(min=0).sqrt_()
+    return distances2 if squared else distances2.clamp(min=0).sqrt()
