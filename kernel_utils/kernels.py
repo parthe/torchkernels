@@ -14,7 +14,7 @@ def laplacian(samples, centers, bandwidth=1., M=None):
 
 def gaussian(samples, centers, bandwidth=1., M=None):
     '''
-        K(x,z)=exp(-\norm{x-z}_M^2 / 2/bandwidth)
+        K(x,z)=exp(-\norm{x-z}_M^2 / 2/bandwidth^2)
     '''
     assert bandwidth > 0
     kernel_mat = euclidean(samples, centers, squared=True, M=M)
