@@ -1,4 +1,4 @@
-# Kernel utilities in PyTorch
+# Utilities for Kernel methods in PyTorch
 Fast implementations of standard kernels such as Gaussian, Laplacian, NTK, and utilities for kernel methods
 
 # Installation
