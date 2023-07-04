@@ -3,7 +3,7 @@ Fast implementations of standard kernels such as Gaussian, Laplacian, NTK, and u
 
 # Installation
 ```
-pip install git+https://github.com/parthe/pytorch_kernel_implementations
+pip install git+https://github.com/parthe/kernel_utils
 ```
 Requires a PyTorch installation
 
@@ -20,15 +20,11 @@ n = 300 # number of samples
 p = 200 # number of centers
 d = 100  # dimensions
 
-if torch.cuda.is_available():
-    DEVICE = torch.device("cuda")
-    DEV_MEM = torch.cuda.get_device_properties(DEVICE).total_memory//1024**3 - 1 # GPU memory in GB, keeping aside 1GB for safety
-else:
-    DEVICE = torch.device("cpu")
-    DEV_MEM = 8 # RAM available for computing
+is_cuda = torch.cuda.is_available():
+DEV = torch.device("cuda") if is_cuda else torch.device("cpu")    
 
-X = torch.randn(n, d, device=DEVICE)
-Z = torch.randn(p, d, device=DEVICE)
+X = torch.randn(n, d, device=DEV)
+Z = torch.randn(p, d, device=DEV)
 
 kernel_matrix = laplacian(X, Z, bandwidth=1.)
 print('Laplacian test complete!')
