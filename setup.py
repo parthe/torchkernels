@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name='kernels',
+    name='kernel_utils',
     version=0.1,
     author='Parthe Pandit',
     author_email='parthe1292@gmail.com',
