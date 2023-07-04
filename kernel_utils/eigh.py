@@ -23,3 +23,11 @@ def top_eigensystem(K, X, q):
     beta = n * scaled_kmat.diag().max()
   
     return E, L[:q], L[q], beta
+
+def nystrom_extension(K, X, Xs, E):
+    """
+        Extend eigenvectors
+    """
+    E = K(X, Xs) @ E
+    E = E/E.norm(dim=0, keepdim=True)
+    return E
