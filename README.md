@@ -20,7 +20,7 @@ n = 300 # number of samples
 p = 200 # number of centers
 d = 100  # dimensions
 
-is_cuda = torch.cuda.is_available():
+is_cuda = torch.cuda.is_available()
 DEV = torch.device("cuda") if is_cuda else torch.device("cpu")    
 
 X = torch.randn(n, d, device=DEV)
