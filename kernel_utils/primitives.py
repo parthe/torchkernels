@@ -51,9 +51,6 @@ def euclidean(samples, centers, squared=False, M=None):
     samples_norm2 = norm(samples, squared=True, M=M)
     centers_norm2 = samples_norm2 if samples is centers else norm(centers, squared=True, M=M)
     
-    distances = inner_product(samples, centers, M=M)
-    distances.mul_(-2)
-    distances.add_(samples_norm2.view(-1, 1))
-    distances.add_(centers_norm2)
+    distances2 = samples_norm2.view(-1, 1) + centers_norm2 - 2 * inner_product(samples, centers, M=M)
 
-    return distances if squared else distances.clamp_(min=0).sqrt_()
+    return distances2 if squared else distances2.clamp_(min=0).sqrt_()
