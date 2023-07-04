@@ -15,7 +15,7 @@ def norm(X, squared=False, M=None):
         pointwise norm (n,).
     '''
     if M is None:
-        X2 = torch.sum(X**2, dim=1)    
+        X2 = torch.sum(X**2, dim=-1)    
         return X2 if squared else X2.sqrt()
     else:
         XMX = ((X @ M) * X).sum(dim=-1)
