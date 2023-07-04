@@ -22,7 +22,7 @@ def top_eigensystem(K, X, q):
     L, E = torch.lobpcg(scaled_kmat, q+1)
     beta = n * scaled_kmat.diag().max()
   
-    return E, L[:q], L[q], beta
+    return E[:,:q], L[:q], L[q], beta
 
 def nystrom_extension(K, X, Xs, E):
     """
