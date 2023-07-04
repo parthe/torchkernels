@@ -1,5 +1,5 @@
 # Utilities for Kernel methods in PyTorch
-Fast implementations of standard kernels such as Gaussian, Laplacian, NTK, and utilities for kernel methods
+Fast implementations of standard utilities 
 
 # Installation
 ```
@@ -29,3 +29,11 @@ Z = torch.randn(p, d, device=DEV)
 kernel_matrix = laplacian(X, Z, bandwidth=1.)
 print('Laplacian test complete!')
 ```
+
+## Currently supported Kernels
+- Laplacian, Gaussian, Dispersal (Exponential power kernel)
+- Normalized dot-product kernel for arbitrary functions
+- Neural Network Gaussian Process (NNGP) and Tangent Kernel (NTK) with ReLU activations
+
+## Other utilities
+- top eigenvectors of kernel matrix
