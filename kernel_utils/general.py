@@ -1,6 +1,6 @@
 from .primitives import norm, inner_product
 
-def normalized_inner_product(func, samples, centers, M=None):
+def normalized_inner_product(func, x, z, M=None):
     """
         K(x,z) = norm(x) * norm(z) * func(<x_, z_>) where x_ = x/norm(x) and z_ = z/norm(z)
     """
