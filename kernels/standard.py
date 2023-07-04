@@ -24,7 +24,7 @@ def gaussian(samples, centers, bandwidth=1., M=None):
     kernel_mat.exp_()
     return kernel_mat
 
-def exponential_power(samples, centers, bandwidth=1., power=1., M=None):
+def exp_power(samples, centers, bandwidth=1., power=1., M=None):
     '''
         K(x,z)=exp(-\norm{x-z}_M^\gamma / bandwidth)
     '''
