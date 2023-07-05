@@ -28,6 +28,5 @@ def nystrom_extension(K, X, Xs, E):
     """
         Extend eigenvectors
     """
-    E = K(X, Xs) @ E
-    E = E/E.norm(dim=0, keepdim=True)
-    return E
+    E_ = K(X, Xs) @ E
+    return E_/E_.norm(dim=0, keepdim=True)
