@@ -1,6 +1,6 @@
 import torch, math
 
-def kmat_vec(K, X, Z, v, out=None, row_chunk_size=None, col_chunk_size=None):
+def KmV(K, X, Z, v, out=None, row_chunk_size=None, col_chunk_size=None):
     """
         calculate kernel matrix vector product K(X, Z) @ v without storing kernel matrix
         If argument `out` is provided, the result is added to `out`
