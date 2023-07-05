@@ -1,5 +1,4 @@
 from .primitives import norm, inner_product
-import torch, math
 
 def normalized_inner_product(func, x, z, M=None):
     """
