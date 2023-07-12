@@ -1,4 +1,4 @@
-from .primitives.linalg import norm, inner_product
+from .linalg import norm, inner_product
 
 def normalized_inner_product(func, x, z, M=None):
     """
