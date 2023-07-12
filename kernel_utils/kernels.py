@@ -1,4 +1,4 @@
-from .primitives import euclidean
+from .primitives.linalg import euclidean
 
 def laplacian(samples, centers, bandwidth=1., M=None):
     '''
