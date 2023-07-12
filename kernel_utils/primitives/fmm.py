@@ -1,4 +1,34 @@
+# Functional matrix multiplication
+#    1. multiplies two matrices in functional form
+#        e.g.: 
+#            if  A_ij = f(xi, xj) 
+#            and B_jk = g(xj, xk)
+#            then (A B)_ik = sum_j f(xi, xj) * g(xj, xk)
+#        can be calculated without storing the entire A and B matrices
+#     2. multiplies a matrix with a vector
+#     3. multiplies a gram-matrix with a vector
+
 import torch, math
+
+def fmm(f1, f2, X, Y, Z, out=None, row_chunk_size=None, col_chunk_size=None, mid_chunk_size=None):
+    """
+        calculate matrix multiplication of f1(X, Y) @ f2(Y, Z) without storing entire matrices
+        If argument `out` is provided, the result is added to `out`
+    """
+    n_r, n_m, n_c = len(X), len(Y), len(Z)
+    b_r = n_r if row_chunk_size is None else row_chunk_size
+    b_m = n_m if mid_chunk_size is None else mid_chunk_size
+    b_c = n_c if col_chunk_size is None else col_chunk_size
+
+    if out is None:
+        out = torch.zeros(n_r, n_c)
+
+    for i in range(math.ceil(n_r/b_r)):
+        for k in range(math.ceil(n_c/b_c)):
+             for j in range(math.ceil(n_m/b_m)):
+                out[i*b_r:(i+1)*b_r, k*b_c:(k+1)*b_c] += f1(X[i*b_r:(i+1)*b_r], Y[j*b_m:(j+1)*b_m]) @ f2(Y[j*b_m:(j+1)*b_m], Z[k*b_c:(k+1)*b_c])
+
+    if out is None: return out
 
 def KmV(K, X, Z, v, out=None, row_chunk_size=None, col_chunk_size=None):
     """
@@ -16,8 +46,7 @@ def KmV(K, X, Z, v, out=None, row_chunk_size=None, col_chunk_size=None):
         for j in range(math.ceil(n_c/b_c)):
              out[i*b_r:(i+1)*b_r] += K(X[i*b_r:(i+1)*b_r], Z[j*b_c:(j+1)*b_c]) @ v[j*b_c:(j+1)*b_c]
 
-    if out is None:
-        return out
+    if out is None: return out
 
 def KtKmV(K, X, Z, v, out=None, row_chunk_size=None, col_chunk_size=None):
     """
