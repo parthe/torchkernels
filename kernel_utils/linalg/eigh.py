@@ -14,7 +14,7 @@ def top_eigensystem(K, X, q):
         E: top-q eigenvectors
         L: top-q eigenvalues of
         lqp1: q+1 st eigenvalue
-        beta: max{i} of K(xi, xi)
+        beta: max{i} of K(xi, xi) - \sum_j=1^q (L[i]-lqp1) psi_j(xi)**2
     """
   
     n = X.shape[0]
