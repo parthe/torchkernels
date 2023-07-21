@@ -20,7 +20,7 @@ def top_eigensystem(K, X, q):
     n = X.shape[0]
     scaled_kmat = K(X, X)/n
     L, E = torch.lobpcg(scaled_kmat, q+1)
-    beta = n * scaled_kmat.diag().max()
+    beta = n * (scaled_kmat.diag() - (E[:q].pow(2)*(L[:q]-L[q])).sum(-1)).max()
   
     return E[:,:q], L[:q], L[q], beta
 
