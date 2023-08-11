@@ -14,7 +14,7 @@ with Python 3.9 and `PyTorch >= 1.13`
 # Test installation with Laplacian kernel
 ```python
 import torch
-from kernel_utils.kernels.radial import laplacian
+from kernel_utils.kernels.radial import laplacian, LaplaceKernel
 
 n = 300 # number of samples
 p = 200 # number of centers
@@ -25,8 +25,10 @@ DEV = torch.device("cuda") if is_cuda else torch.device("cpu")
 
 X = torch.randn(n, d, device=DEV)
 Z = torch.randn(p, d, device=DEV)
+K = LaplaceKernel(bandwidth=1.)
 
-kernel_matrix = laplacian(X, Z, bandwidth=1.)
+kernel_matrix1 = laplacian(X, Z, bandwidth=1.)
+kernel_matrix2 = K(X, Z)
 print('Laplacian test complete!')
 ```
 
