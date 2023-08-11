@@ -4,41 +4,30 @@ from torch import nn
 class KernelModel(nn.Module):
     
     def __init__(self, kernel_fn, centers, weights=None, tasks=None):
-        self.kernel = kernel_fn
-        self.centers = centers
+        self.kernel, self.centers = kernel_fn, centers
         self.size, self.dim = (len(centers), 1) if len(centers.shape)==1 else centers.shape
-        self.weights = weights
-        self.tasks = tasks
+        self.weights, self.tasks = weights, tasks
         if weights is not None:
             p_, t_ = (len(weights), 1) if len(weights.shape)==1 else weights.shape
-            assert p_==self.size, "number of centers and number of weights do not match"
-            if tasks is None: self.tasks = t_
+            assert p_ == self.size, "number of centers and number of weights do not match"
+            self.tasks = t_
+            if tasks is not None:
+                assert tasks == self.tasks, "number of tasks in weights provided do not match `tasks`"
     
     def forward(self, samples):
         return KmV(self.kernel, samples, self.centers, self.weights)
-
-    def matrix(self, samples):
-        return self.kernel(samples, self.centers)
     
-    def fit(self, samples, labels, reg=0., method='solve'):
+    def fit(self, labels, reg=0.):
+        """
+        solves the kernel regression problem (K + reg*I) a = labels
+        """
         n, c = (len(y), 1) if len(labels.shape)==1 else labels.shape
-        n_, d_ = len(samples), 1 if len(samples.shape)==1 else samples.shape
-        self.tasks = c_ if self.tasks is None else self.tasks
-        assert n_==n, "number of samples do not match number of labels"
-        assert d_==self.dim, "number of dimensions of samples and model centers do not match"
-        assert self.tasks==c_, "number of tasks of labels and model weights do not match"
-        if (samples is self.centers) or (samples is None):
-            self.fit_solve(labels, reg)
-        else:
-            self.fit_lstsq(samples, labels, reg=0.)
-      
-    def fit_lstsq(self, samples, labels, reg=0.):
-        Kmat = self.kernel(samples, centers)
-        self.weights = torch.linalg.lstsq(Kmat, y)
+        self.tasks = c if self.tasks is None else self.tasks
+        assert n==self.size, "number of samples in (labels) and (self.centers) do not match"
+        assert c==self.tasks, "number of tasks in (labels) and (self.tasks) do not match"
+        kmat = self.kernel(self.centers)
+        self.weights = torch.linalg.solve(kmat + reg*torch.eye(n, dtype=kmat.dtype), labels.type(kmat.type()))
 
-    def fit_solve(self, labels, reg=0.):
-        Kmat = self.kernel(samples, centers)
-        raise NotImplementedError("Incomplete")
-        Kty = self.
-        self.weights = torch.linalg.solve(Kmat + reg*torch.eye(self.size), labels)
+    def score(self, samples, labels, score_fn):
+        return score_fn(self.forward(samples), labels)
   
