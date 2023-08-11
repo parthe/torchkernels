@@ -16,7 +16,7 @@ class RadialKernel(Kernel):
     def __call__(self, samples, centers=None, M=None, **kwargs):
         if centers is None: 
             centers = samples
-        super().__call__(
+        return super().__call__(
             self.fn(euclidean(samples, centers, squared=self.squared, M=M).div(-self.bandwidth)), **kwargs)
 
 class LaplacianKernel(RadialKernel):
