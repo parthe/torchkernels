@@ -1,5 +1,6 @@
 from .linalg.fmm import KmV
 
+
 class KernelModel(nn.Module):
     
     def __init__(self, kernel_fn, centers, weights=None, tasks=None):
