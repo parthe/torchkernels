@@ -1,6 +1,7 @@
 from ..linalg import euclidean
 from .__init__ import Kernel
-from torch import nn
+
+
 
 class RadialKernel(Kernel):
     '''
@@ -65,3 +66,10 @@ def exp_power(samples, centers=None, bandwidth=1., power=1., M=None):
     kernel_mat.div_(-bandwidth)
     kernel_mat.exp_()
     return kernel_mat
+
+
+# Aliases
+exponential_power = exp_power
+dispersal = exp_power
+rbf = gaussian
+laplace = laplacian
