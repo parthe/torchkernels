@@ -1,9 +1,10 @@
 from .linalg.fmm import KmV
+from torch import nn
 
-class KernelModel:
+class KernelModel(nn.Module):
     
     def __init__(self, kernel_fn, centers, weights=None, tasks=None):
-        self.K = kernel_fn
+        self.kernel = kernel_fn
         self.centers = centers
         self.size, self.dim = (len(centers), 1) if len(centers.shape)==1 else centers.shape
         self.weights = weights
@@ -13,8 +14,11 @@ class KernelModel:
             assert p_==self.size, "number of centers and number of weights do not match"
             if tasks is None: self.tasks = t_
     
-    def __call__(self, samples):
-        return KmV(self.K, samples, self.centers, self.weights)
+    def forward(self, samples):
+        return KmV(self.kernel, samples, self.centers, self.weights)
+
+    def matrix(self, samples):
+        return self.kernel(samples, self.centers)
     
     def fit(self, samples, labels, reg=0., method='solve'):
         n, c = (len(y), 1) if len(labels.shape)==1 else labels.shape
@@ -29,11 +33,11 @@ class KernelModel:
             self.fit_lstsq(samples, labels, reg=0.)
       
     def fit_lstsq(self, samples, labels, reg=0.):
-        Kmat = self.K(samples, centers)
+        Kmat = self.kernel(samples, centers)
         self.weights = torch.linalg.lstsq(Kmat, y)
 
     def fit_solve(self, labels, reg=0.):
-        Kmat = self.K(samples, centers)
+        Kmat = self.kernel(samples, centers)
         raise NotImplementedError("Incomplete")
         Kty = self.
         self.weights = torch.linalg.solve(Kmat + reg*torch.eye(self.size), labels)
