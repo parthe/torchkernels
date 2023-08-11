@@ -25,10 +25,12 @@ DEV = torch.device("cuda") if is_cuda else torch.device("cpu")
 
 X = torch.randn(n, d, device=DEV)
 Z = torch.randn(p, d, device=DEV)
-K = LaplacianKernel(bandwidth=1.)
 
 kernel_matrix1 = laplacian(X, Z, bandwidth=1.)
+
+K = LaplacianKernel(bandwidth=1.)
 kernel_matrix2 = K(X, Z)
+
 print('Laplacian test complete!')
 ```
 
