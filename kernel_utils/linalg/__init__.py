@@ -15,10 +15,10 @@ def norm(X, squared=False, M=None):
         pointwise norm (n,).
     '''
     if M is None:
-        X2 = torch.sum(X**2, dim=-1)    
+        X2 = torch.sum(X**2, dim=-1).clamp(min=0)
         return X2 if squared else X2.sqrt()
     else:
-        XMX = ((X @ M) * X).sum(dim=-1)
+        XMX = ((X @ M) * X).sum(dim=-1).clamp(min=0)
         return XMX if squared else XMX.sqrt()
 
 def inner_product(samples, centers, M=None):
@@ -54,5 +54,5 @@ def euclidean(samples, centers, squared=False, M=None):
     distances2 = ((samples_norm2 if len(centers_norm2.shape)==0 else samples_norm2.unsqueeze(-1)) 
                 + centers_norm2 
                 - 2 * inner_product(samples, centers, M=M))
-
-    return distances2 if squared else distances2.clamp(min=0).sqrt()
+    distances2.clamp_(min=0)
+    return distances2 if squared else distances2.sqrt()
