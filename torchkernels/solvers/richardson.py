@@ -2,7 +2,7 @@ import torch
 from math import ceil
 from pytictoc import TicToc; timer = TicToc()
 
-def batched(K, X, y, q, m=None, epochs=1, return_error=True, seed=None):
+def batched(K, X, y, m=None, epochs=1, return_error=True, seed=None):
     """
         Storage: (n x q) + s2
         FLOPS at setup: (s x q2) + 
