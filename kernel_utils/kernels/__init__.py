@@ -1,12 +1,13 @@
-from torch import nn
-
-class Kernel(nn.Module):
+class Kernel:
     def __init__(self):
         self._matrix = None
         pass
-      
-    def forward(self, x, z=None, save=False):
-        pass
+
+    def __call__(self, value, save=False):
+        if save: 
+            self.matrix = value
+        else:
+            return value
 
     @property
     def matrix(self):
