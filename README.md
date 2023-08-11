@@ -3,7 +3,7 @@ Fast implementations of standard utilities
 
 # Installation
 ```
-pip install git+https://github.com/parthe/kernel_utils
+pip install git+https://github.com/parthe/torchkernels
 ```
 Requires a PyTorch installation
 
@@ -14,7 +14,7 @@ with Python 3.9 and `PyTorch >= 1.13`
 # Test installation with Laplacian kernel
 ```python
 import torch
-from kernel_utils.kernels.radial import laplacian, LaplacianKernel
+from torchkernels.kernels.radial import laplacian, LaplacianKernel
 
 n = 300 # number of samples
 p = 200 # number of centers
