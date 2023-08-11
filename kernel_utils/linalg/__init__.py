@@ -53,6 +53,5 @@ def euclidean(samples, centers, squared=False, M=None):
     
     distances2 = ((samples_norm2 if len(centers_norm2.shape)==0 else samples_norm2.unsqueeze(-1)) 
                 + centers_norm2 
-                - 2 * inner_product(samples, centers, M=M))
-    distances2.clamp_(min=0)
+                - 2 * inner_product(samples, centers, M=M)).clamp(min=0)
     return distances2 if squared else distances2.sqrt()
