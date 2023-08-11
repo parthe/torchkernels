@@ -19,8 +19,10 @@ def fmm(f1, f2, X, Y, Z, out=None, row_chunk_size=None, col_chunk_size=None, mid
     b_r = n_r if row_chunk_size is None else row_chunk_size
     b_m = n_m if mid_chunk_size is None else mid_chunk_size
     b_c = n_c if col_chunk_size is None else col_chunk_size
-
+    
+    return_flag = False
     if out is None:
+        return_flag = True
         out = torch.zeros(n_r, n_c)
 
     for i in range(math.ceil(n_r/b_r)):
@@ -28,7 +30,7 @@ def fmm(f1, f2, X, Y, Z, out=None, row_chunk_size=None, col_chunk_size=None, mid
              for j in range(math.ceil(n_m/b_m)):
                 out[i*b_r:(i+1)*b_r, k*b_c:(k+1)*b_c] += f1(X[i*b_r:(i+1)*b_r], Y[j*b_m:(j+1)*b_m]) @ f2(Y[j*b_m:(j+1)*b_m], Z[k*b_c:(k+1)*b_c])
 
-    if out is None: return out
+    if return_flag: return out
 
 def KmV(K, X, Z, v, out=None, row_chunk_size=None, col_chunk_size=None):
     """
