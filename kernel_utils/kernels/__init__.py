@@ -22,7 +22,7 @@ class Kernel(nn.Module):
 
     @matrix.setter
     def matrix(self, value):
-        return self._matrix = value
+        self._matrix = value
 
     @matrix.deleter
     def matrix(self):
