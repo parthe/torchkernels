@@ -1,12 +1,4 @@
-from .radial import laplacian, gaussian, exp_power
 from torch import nn
-
-# Aliases
-exponential_power = exp_power
-dispersal = exp_power
-rbf = gaussian
-laplace = laplacian
-
 
 class Kernel(nn.Module):
     def __init__(self):
