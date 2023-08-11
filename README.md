@@ -1,4 +1,4 @@
-# Utilities for Kernel methods in PyTorch
+# Kernel methods in PyTorch
 Fast implementations of standard utilities 
 
 # Installation
