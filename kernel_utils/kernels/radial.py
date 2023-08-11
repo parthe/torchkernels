@@ -2,36 +2,34 @@ from ..linalg import euclidean
 from .__init__ import Kernel
 
 
-
 class RadialKernel(Kernel):
     '''
         K(x,z)=phi(-\norm{x-z}_M / bandwidth) where phi is specified in subclass
     '''
     def __init__(self, fn=None, bandwidth=1., squared=True):
+        super().__init__()
         self.fn = fn
         self.squared = squared
         assert bandwidth > 0, "argument `bandwidth` must be positive."
         self.bandwidth = 2 * bandwidth**2 if squared else bandwidth
 
-    def forward(self, samples, centers=None, M=None):
+    def __call__(self, samples, centers=None, M=None, **kwargs):
         if centers is None: 
             centers = samples
-        return self.fn(euclidean(samples, centers, squared=self.squared, M=M).div_(-self.bandwidth))
+        super().__call__(
+            self.fn(euclidean(samples, centers, squared=self.squared, M=M).div(-self.bandwidth)), **kwargs)
 
 class LaplacianKernel(RadialKernel):
     def __init__(self, bandwidth=1.):
-        def phi(k): k.exp_()
-        super().__init__(fn=phi, squared=False, bandwidth=bandwidth)
+        super().__init__(fn=lambda x: x.exp(), bandwidth=bandwidth, squared=False)
     
 class GaussianKernel(RadialKernel):
     def __init__(self, bandwidth=1.):
-        def phi(k): k.exp_()
-        super().__init__(fn=phi, squared=True, bandwidth=bandwidth)
+        super().__init__(fn=lambda x: x.exp(), bandwidth=bandwidth, squared=True)
     
-class ExpPowerKernel(RadialKernel):
-    def __init__(self, power=1.,bandwidth=1.):
-        def phi(k): k.pow_(power/2).exp_()
-        super().__init__(fn=phi, squared=True, bandwidth=bandwidth)
+class ExponentialPowerKernel(RadialKernel):
+    def __init__(self, bandwidth=1.):
+        super().__init__(fn=lambda x: x.pow(power/2).exp(), bandwidth=bandwidth, squared=True)
 
 def laplacian(samples, centers=None, bandwidth=1., M=None):
     '''
