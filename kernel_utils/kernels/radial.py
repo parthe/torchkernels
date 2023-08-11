@@ -1,7 +1,8 @@
 from ..linalg import euclidean
+from .__init__ import Kernel
 from torch import nn
 
-class RadialKernel(nn.Module):
+class RadialKernel(Kernel):
     '''
         K(x,z)=phi(-\norm{x-z}_M / bandwidth) where phi is specified in subclass
     '''
