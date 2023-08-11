@@ -1,5 +1,4 @@
 from .linalg.fmm import KmV
-from torch import nn
 
 class KernelModel(nn.Module):
     
@@ -14,7 +13,7 @@ class KernelModel(nn.Module):
             if tasks is not None:
                 assert tasks == self.tasks, "number of tasks in weights provided do not match `tasks`"
     
-    def forward(self, samples):
+    def __call__(self, samples):
         return KmV(self.kernel, samples, self.centers, self.weights)
     
     def fit(self, labels, reg=0.):
