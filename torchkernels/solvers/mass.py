@@ -1,7 +1,8 @@
 import torch
-from math import ceil
+from math import ceil, sqrt
 from torchkernels.linalg.fmm import KmV
 from __init__ import timer
+from functools import cache
 
 
 def mass(K, X, y, m=None, epochs=1):
@@ -13,17 +14,27 @@ def mass(K, X, y, m=None, epochs=1):
     timer.tic()
     n = X.shape[0]
     kmat = K(X)
-    l1, _ = torch.lobpcg(kmat/n, 1)
+    lam_1, _ = torch.lobpcg(kmat/n, 1, largest=True)
+    lam_n, _ = torch.lobpcg(kmat/n, 1, largest=False)
     beta = kmat.diag().max()
-    b = torch.zeros_like(y, dtype=kmat.dtype)
-    d = torch.zeros_like(y, dtype=kmat.dtype)
-    bs_crit = int(beta/l1) + 1
+    b, d = torch.zeros_like(y, dtype=kmat.dtype), torch.zeros_like(y, dtype=kmat.dtype)
+    bs_crit = int(beta/lam_1) + 1
     if m is None: m = bs_crit 
-    η1 = lambda bs: 1/beta if bs < bs_crit else 2/(beta+(bs-1)*l1)
-    η2 = lambda bs: 1
-    γ = lambda bs: 0.9
-    mse = torch.zeros(epochs*ceil(n/m))
-    print(f"bs_crit={bs_crit}, m={m}, η1={η1(m)}, η2={η2(m)}, γ={γ(m)}")
+
+    @cache
+    def η1(m): return 1/beta if m < bs_crit else 2/(beta+(m-1)*lam_1)
+
+    @cache
+    def sqrt_κm_κm_til(m): return sqrt((beta + (m-1)*lam_1)*(m+n-1)/lam_n)/m
+
+    @cache
+    def η2(m): return η1(m) * (n-1)/(n+m-1) * 1/(1+1/sqrt_κm_κm_til(m))
+
+    @cache
+    def γ(m): return (sqrt_κm_κm_til(m)-1)/(sqrt_κm_κm_til(m)+1)/m
+
+    print(f"bs_crit={bs_crit}, m={m}, η1={η1(m).item()}, "
+        f"η2={η2(m).item()}, γ={γ(m)}")
     timer.toc("MaSS Setup :", restart=True)
     for t in range(epochs):
         batches = torch.randperm(n).split(m)
