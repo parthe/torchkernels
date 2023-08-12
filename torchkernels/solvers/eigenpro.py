@@ -1,33 +1,45 @@
-from ..linalg.eigh import top_eigensystem, nystrom_extension
+from torchkernels.linalg.eigh import top_eigensystem, nystrom_extension
+from torchkernels.linalg.fmm import KmV
+from __init__ import timer
+from math import ceil
 
-def eigenpro(K, X, y, q, m=None, epochs=1, return_error=True, seed=None):
+
+def eigenpro(K, X, y, q, m=None, epochs=1):
     """
         Storage: (n x q) + s2
         FLOPS at setup: (s x q2) + 
         FLOPS per batch: (n x m) + {(m x q) + (n x q)}
     """
-    if seed is not None: torch.manual_seed(seed)
     timer.tic()
     n = X.shape[0]
-    nids = torch.randperm(n)[:q*10]
-    val_ids = torch.randperm(n)[:q*10]
-    if return_error: K_val = K(X[val_ids], X)
     E, L, lqp1, beta = top_eigensystem(K, X, q)
-    F = E * (1-lqp1/L).sqrt()
-    del E
-    a = torch.zeros_like(y, dtype=F.dtype)
+    E.mul_((1-lqp1/L).sqrt())
+    a = torch.zeros_like(y, dtype=E.dtype)
     bs_crit = int(beta/lqp1) + 1
     if m is None: m = bs_crit 
     lr = lambda bs: 1/beta if bs < bs_crit else 2/(beta+(bs-1)*lqp1)
-    mse = torch.zeros(epochs*ceil(n/m))
     print(f"bs_crit={bs_crit}, m={m}, lr={lr(m)}")
     timer.toc("EigenPro Setup :", restart=True)
     for t in range(epochs):
         batches = torch.randperm(n).split(m)
         for i, bids in enumerate(batches):
-            gm = K(X[bids], X) @ a - y[bids].type(a.type())
+            gm = KmV(K, X[bids], X, a) - y[bids].type(a.type())
             a[bids] = a[bids] - lr(len(bids)) * gm
-            a += lr(len(bids)) *  F @ (F[bids].T  @ gm)
-            if return_error: mse[t*len(batches)+i] = (K_val @ a - y).var()
+            a += lr(len(bids)) *  E @ (E[bids].T  @ gm)
     timer.toc("EigenPro Iterations :")
-    return (a, None) if not return_error else (a, mse)
+    return a
+
+if __name__ == "__main__":
+
+    from torchkernels.kernels.radial import LaplacianKernel
+    from __init__ import lstsq
+    import torch
+    torch.set_default_dtype(torch.float64)
+    K = LaplacianKernel(bandwidth=1.)
+    n, d, c, q = 100, 3, 2, 30
+    X = torch.randn(n, d)
+    y = torch.randn(n, c)
+    ahat = eigenpro(K, X, y, q, epochs=n)
+    astar = lstsq(K, X, X, y)
+    print((KmV(K,X,X,ahat)-y).var())
+    print((KmV(K,X,X,astar)-y).var())

@@ -1,5 +1,6 @@
 from torchkernels.linalg.fmm import KmV 
-from pytictoc import TicToc; timer = TicToc()
+from __init__ import timer
+
 
 def conjugate_gradient(K, X, y, epochs=None):
 
@@ -16,7 +17,6 @@ def conjugate_gradient(K, X, y, epochs=None):
         r -= alpha * Kp
         beta = r.pow(2).sum(0)/r_norm2
         p = r + beta*p
-        print(t, r.var().log10().item())
     timer.toc("Conjugate Gradient Iterations :")
     return x
 
