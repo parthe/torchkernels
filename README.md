@@ -31,6 +31,7 @@ kernel_matrix1 = laplacian(X, Z, bandwidth=1.)
 K = LaplacianKernel(bandwidth=1.)
 kernel_matrix2 = K(X, Z)
 
+torch.testing.assert_close(kernel_matrix1, kernel_matrix2, msg='Laplacian test failed')
 print('Laplacian test complete!')
 ```
 
