@@ -21,13 +21,13 @@ def richardson(K, X, y, m=None, epochs=1):
     lr = lambda bs: 1/beta if bs < bs_crit else 2/(beta+(bs-1)*l1)
     mse = torch.zeros(epochs*ceil(n/m))
     print(f"bs_crit={bs_crit}, m={m}, lr={lr(m)}")
-    timer.toc("EigenPro1 Setup :", restart=True)
+    timer.toc("Richardson Setup :", restart=True)
     for t in range(epochs):
         batches = torch.randperm(n).split(m)
         for i, bids in enumerate(batches):
             gm = KmV(K, X[bids], X, a) - y[bids].type(a.type())
             a[bids] = a[bids] - lr(len(bids)) * gm
-    timer.toc("EigenPro1 Iterations :")
+    timer.toc("Richardson Iterations :")
     return a
 
 if __name__ == "__main__":
