@@ -1,5 +1,5 @@
 import torch
-from math import ceil, sqrt
+from math import ceil
 from torchkernels.linalg.fmm import KmV
 from __init__ import timer
 from functools import cache
@@ -17,7 +17,7 @@ def mass(K, X, y, m=None, epochs=1):
     lam_1, _ = torch.lobpcg(kmat/n, 1, largest=True)
     lam_n, _ = torch.lobpcg(kmat/n, 1, largest=False)
     beta = kmat.diag().max()
-    b, d = torch.zeros_like(y, dtype=kmat.dtype), torch.zeros_like(y, dtype=kmat.dtype)
+    a, b = torch.zeros_like(y, dtype=kmat.dtype), torch.zeros_like(y, dtype=kmat.dtype)
     bs_crit = int(beta/lam_1) + 1
     if m is None: m = bs_crit 
 
@@ -25,7 +25,7 @@ def mass(K, X, y, m=None, epochs=1):
     def η1(m): return 1/beta if m < bs_crit else 2/(beta+(m-1)*lam_1)
 
     @cache
-    def sqrt_κm_κm_til(m): return sqrt((beta + (m-1)*lam_1)*(m+n-1)/lam_n)/m
+    def sqrt_κm_κm_til(m): return torch.sqrt((beta + (m-1)*lam_1)*(m+n-1)/lam_n)/m
 
     @cache
     def η2(m): return η1(m) * (n-1)/(n+m-1) * 1/(1+1/sqrt_κm_κm_til(m))
@@ -39,15 +39,22 @@ def mass(K, X, y, m=None, epochs=1):
     for t in range(epochs):
         batches = torch.randperm(n).split(m)
         for i, bids in enumerate(batches):
-            gm = KmV(K, X[bids], X, b) - y[bids].type(b.type())
-            d.mul_(γ(len(bids)))
-            d[bids] += (η2(len(bids)) - (1 + γ(len(bids)))*η1(len(bids)))*gm
-            if t+i>0: # skip for 1st step
-                d[bids_] += γ(len(bids)) * η1(len(bids)) * gm_
-            gm_, bids_ = gm.clone(), bids.clone()
-            b.add_(d)
+            # gm = KmV(K, X[bids], X, b) - y[bids].type(b.type())
+            # d.mul_(γ(len(bids)))
+            # d[bids] += (η2(len(bids)) - (1 + γ(len(bids)))*η1(len(bids)))*gm
+            # if t+i>0: # skip for 1st step
+            #     d[bids_] += γ(len(bids)) * η1(len(bids)) * gm_
+            # gm_, bids_ = gm.clone(), bids.clone()
+            # b.add_(d)
+            gm = KmV(K, X[bids],X, b) - y[bids].type(b.type())
+            a_ = a.clone()
+            a = b
+            a[bids] -= η1(m)*gm
+            b = a + γ(m)*(a-a_)
+            b[bids] += η2(m)*gm
+        print(t, (kmat @ a - y).var())
     timer.toc("MaSS Iterations :")
-    return b
+    return a
 
 
 if __name__ == "__main__":
