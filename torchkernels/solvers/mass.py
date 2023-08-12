@@ -22,16 +22,25 @@ def mass(K, X, y, m=None, epochs=1):
     if m is None: m = bs_crit 
 
     @cache
-    def η1(m): return 1/beta if m < bs_crit else 2/(beta+(m-1)*lam_1)
+    def kappa_til(m): return n/m + (m - 1)/m
 
     @cache
-    def sqrt_κm_κm_til(m): return torch.sqrt((beta + (m-1)*lam_1)*(m+n-1)/lam_n)/m
+    def L(m): return beta/m + (m-1)*lam_1/m
 
     @cache
-    def η2(m): return η1(m) * (n-1)/(n+m-1) * 1/(1+1/sqrt_κm_κm_til(m))
+    def kappa(m): return L(m)/lam_n
 
     @cache
-    def γ(m): return (sqrt_κm_κm_til(m)-1)/(sqrt_κm_κm_til(m)+1)/m
+    def η1(m): return 1/L(m)
+
+    @cache
+    def sqrt_κm_κm_til(m): return torch.sqrt(kappa(m) * kappa_til(m))
+
+    @cache
+    def η2(m): return ((η1(m) * sqrt_κm_κm_til(m)) / (sqrt_κm_κm_til(m) + 1)) * (1 - 1/kappa_til(m))
+
+    @cache
+    def γ(m): return (sqrt_κm_κm_til(m) - 1) / (sqrt_κm_κm_til(m) + 1)
 
     print(f"bs_crit={bs_crit}, m={m}, η1={η1(m).item()}, "
         f"η2={η2(m).item()}, γ={γ(m)}")
