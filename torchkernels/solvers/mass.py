@@ -21,26 +21,13 @@ def mass(K, X, y, m=None, epochs=1):
     bs_crit = int(beta/lam_1) + 1
     if m is None: m = bs_crit 
 
-    @cache
-    def kappa_til(m): return n/m + (m - 1)/m
-
-    @cache
-    def L(m): return beta/m + (m-1)*lam_1/m
-
-    @cache
-    def kappa(m): return L(m)/lam_n
-
-    @cache
-    def η1(m): return 1/L(m)
-
-    @cache
-    def sqrt_κm_κm_til(m): return torch.sqrt(kappa(m) * kappa_til(m))
-
-    @cache
-    def η2(m): return ((η1(m) * sqrt_κm_κm_til(m)) / (sqrt_κm_κm_til(m) + 1)) * (1 - 1/kappa_til(m))
-
-    @cache
-    def γ(m): return (sqrt_κm_κm_til(m) - 1) / (sqrt_κm_κm_til(m) + 1)
+    L = cache(lambda m: beta/m + (m-1)*lam_1/m)
+    kappa = cache(lambda m: L(m)/lam_n)
+    kappa_til = cache(lambda m: n/m + (m - 1)/m)
+    sqrt_κm_κm_til = cache(lambda m: torch.sqrt(kappa(m) * kappa_til(m)))
+    η1 = cache(lambda m: 1/L(m))
+    η2 = cache(lambda m: ((η1(m) * sqrt_κm_κm_til(m)) / (sqrt_κm_κm_til(m) + 1)) * (1 - 1/kappa_til(m)))
+    γ = cache(lambda m: (sqrt_κm_κm_til(m) - 1) / (sqrt_κm_κm_til(m) + 1))
 
     print(f"bs_crit={bs_crit}, m={m}, η1={η1(m).item()}, "
         f"η2={η2(m).item()}, γ={γ(m)}")
