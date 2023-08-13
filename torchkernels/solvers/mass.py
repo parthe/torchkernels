@@ -27,7 +27,7 @@ def mass(K, X, y, m=None, epochs=1):
     sqrt_κm_κm_til = cache(lambda m: torch.sqrt(kappa(m) * kappa_til(m)))
     η1 = cache(lambda m: 1/L(m))
     η2 = cache(lambda m: ((η1(m) * sqrt_κm_κm_til(m)) / (sqrt_κm_κm_til(m) + 1)) * (1 - 1/kappa_til(m)))
-    γ = cache(lambda m: (sqrt_κm_κm_til(m) - 1) / (sqrt_κm_κm_til(m) + 1))
+    γ = cache(lambda m: (sqrt_κm_κm_til(m) - 1) / (sqrt_κm_κm_til(m) + 1)/m)
 
     print(f"bs_crit={bs_crit}, m={m}, η1={η1(m).item()}, "
         f"η2={η2(m).item()}, γ={γ(m)}")
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     n, d, c = 100, 3, 2
     X = torch.randn(n, d)
     y = torch.randn(n, c)
-    ahat = mass(K, X, y, epochs=100)
+    ahat = mass(K, X, y, epochs=1000)
     astar = lstsq(K, X, X, y)
     print((KmV(K, X, X, ahat) - y).var())
     print((KmV(K, X, X, astar) - y).var())
