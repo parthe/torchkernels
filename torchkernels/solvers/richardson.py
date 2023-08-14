@@ -20,6 +20,7 @@ def richardson(K, X, y, m=None, epochs=1):
     bs_crit = int(beta/lam_1) + 1
     if m is None: m = bs_crit 
     η = cache(lambda m: 1/beta if m < bs_crit else 2/(beta+(m-1)*lam_1))
+    
     print(f"bs_crit={bs_crit}, m={m}, η={η(m).item()}")
     timer.toc("Richardson Setup :", restart=True)
     for t in range(epochs):
