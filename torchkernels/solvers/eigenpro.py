@@ -19,8 +19,8 @@ def eigenpro(K, X, y, q, m=None, epochs=1):
     a = torch.zeros_like(y, dtype=E.dtype)
     bs_crit = int(beta/lqp1) + 1
     if m is None: m = bs_crit 
-    @cache
-    def η(m): return 1/beta if m < bs_crit else 2/(beta+(m-1)*lqp1)
+    η = cache(lambda m: 1/beta if m < bs_crit else 2/(beta+(m-1)*lqp1))
+
     print(f"bs_crit={bs_crit}, m={m}, η={η(m).item()}")
     timer.toc("EigenPro Setup :", restart=True)
     for t in range(epochs):

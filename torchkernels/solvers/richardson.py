@@ -19,8 +19,7 @@ def richardson(K, X, y, m=None, epochs=1):
     a = torch.zeros_like(y, dtype=kmat.dtype)
     bs_crit = int(beta/lam_1) + 1
     if m is None: m = bs_crit 
-    @cache
-    def η(m): return 1/beta if m < bs_crit else 2/(beta+(m-1)*lam_1)
+    η = cache(lambda m: 1/beta if m < bs_crit else 2/(beta+(m-1)*lam_1))
     print(f"bs_crit={bs_crit}, m={m}, η={η(m).item()}")
     timer.toc("Richardson Setup :", restart=True)
     for t in range(epochs):
