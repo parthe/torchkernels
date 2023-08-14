@@ -1,3 +1,4 @@
+import torch
 from torchkernels.linalg.eigh import top_eigensystem, nystrom_extension
 from torchkernels.linalg.fmm import KmV
 from __init__ import timer
