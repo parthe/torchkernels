@@ -9,3 +9,6 @@ def vectorize(fn):
   return vmap(
     vmap(kernel, in_dims=(None, 0)), 
     in_dims=(0, None))
+    
+def grad1(kernel):
+    return grad(kernel)
