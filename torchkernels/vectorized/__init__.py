@@ -1,8 +1,10 @@
 from torch.func import vmap, grad
 
-def vectorize(kernel):
+def vectorize(fn):
   """
-  Takes a method `kernel` from Rd x Rd -> R
+  Vectorizes a bivariate method 
+  If `fn` maps inputs (d1,) and (d2,) --> (d3,)
+  `vectorize(fn)` maps inputs (n, d1) and (p, d2) --> (n, p, d3)
   """
   return vmap(
     vmap(kernel, in_dims=(None, 0)), 
