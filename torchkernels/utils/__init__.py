@@ -1,6 +1,6 @@
 from torch.func import vmap, grad
 import functools
-
+from time import time
 
 def vectorize(kernel_fn):
   """
@@ -15,7 +15,15 @@ def vectorize(kernel_fn):
         ),
     kernel_fn
     )
-    
-@vectorize
-def grad1(kernel):
-    return grad(kernel)
+
+
+def timeit(func):
+    # This function shows the execution time of the function object passed
+    @functools.wraps(func)
+    def wrap_func(*args, **kwargs):
+        t1 = time()
+        result = func(*args, **kwargs)
+        t2 = time()
+        print(f'Function {func.__name__!r} executed in {(t2-t1):.4f}s')
+        return result
+    return wrap_func
