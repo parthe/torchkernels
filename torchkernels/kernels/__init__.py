@@ -1,3 +1,6 @@
+from torch.func import grad
+
+
 class Kernel:
     def __init__(self):
         self._matrix = None
@@ -20,3 +23,7 @@ class Kernel:
     @matrix.deleter
     def matrix(self):
         del self._matrix
+
+    def grad1(self):
+        return grad(self.__call__)
+
