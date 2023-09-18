@@ -22,7 +22,7 @@ def top_eigensystem(K, X, q, method='scipy.linalg.eigh'):
     scaled_kmat = K(X, X)/n
     if method == "scipy.linalg.eigh":
       L, E = scipy.linalg.eigh(scaled_kmat.cpu().numpy(), subset_by_index=[n-q-1,n-1])
-      L, E = torch.from_numpy(L).to(scaled_kmat.device), torch.from_numpy(E).to(scaled_kmat.device)
+      L, E = torch.from_numpy(L).to(scaled_kmat.device).flip(), torch.from_numpy(E).to(scaled_kmat.device).fliplr()
     elif method == "torch.lobpcg":
       L, E = torch.lobpcg(scaled_kmat, q+1)
     beta = n * (scaled_kmat.diag() - (E[:,:q].pow(2)*(L[:q]-L[q])).sum(-1)).max()
