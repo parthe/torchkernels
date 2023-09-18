@@ -10,6 +10,34 @@ from functools import cache
 steps = 3
 
 
+def multistep_richardson(K, X, y, m=None, epochs=1, steps=3):
+    timer.tic()
+    n = X.shape[0]
+    E, L, lqp1, beta = top_eigensystem(K, X, 1)
+    a = torch.zeros_like(y, dtype=E.dtype)
+    bs_crit = int(beta/lqp1) + 1
+    if m is None: m = bs_crit 
+    η  = cache(lambda m: 1/beta if m < bs_crit else 2/(beta+(m-1)*lqp1))
+
+    print(f"bs_crit={bs_crit}, m={m}, η={η(m).item()}")
+    timer.toc("Multi EigenPro Setup :", restart=True)
+    for t in range(epochs):
+        batches = torch.randperm(n).split(m)
+        for i, bids in enumerate(batches):
+            sgm = torch.zeros_like(y[bids], dtype=a.dtype)
+            for step in range(steps):
+                if step==0:
+                    gm = KmV(K, X[bids], X, a) - y[bids].type(a.type())
+                else:
+                    gm -= η(len(bids)) * KmV(K, X[bids], X[bids], gm)
+                sgm += gm
+            a.index_add_(0, bids, η(len(bids)) * sgm, alpha=-1)
+        # print(t, (Kmat @ a - y).var())
+    timer.toc(f"Multi Richardson Iterations ({steps} steps):")
+    return a
+
+
+
 def multistep_eigenpro(K, X, y, q, m=None, epochs=1, steps=3):
 
     timer.tic()
