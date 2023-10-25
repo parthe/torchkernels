@@ -2,7 +2,7 @@ import torch
 
 eps = 1e-12
 
-def norm(X, squared=False, M=None):
+def norm(X, squared=False, M=None, keepdim=False):
     '''Calculate the norm.
     If `M` is not None, then Mahalanobis norm is calculated.
 
@@ -15,11 +15,12 @@ def norm(X, squared=False, M=None):
         pointwise norm (n,).
     '''
     if M is None:
-        X2 = torch.sum(X**2, dim=-1).clamp(min=0)
-        return X2 if squared else X2.sqrt()
+        X_norm = X.pow(2).sum(dim=1, keepdim=keepdim)
     else:
-        XMX = ((X @ M) * X).sum(dim=-1).clamp(min=0)
-        return XMX if squared else XMX.sqrt()
+        X_norm = ((X @ M) * X).sum(dim=1, keepdim=keepdim)
+    if not squared:
+        X_norm.clamp_(min=0).sqrt_()
+    return X_norm
 
 def inner_product(samples, centers, M=None):
     '''Calculate the pairwise inner-product.
@@ -48,10 +49,13 @@ def euclidean(samples, centers, squared=False, M=None):
     Returns:
         pointwise distances (n, p).
     '''
-    samples_norm2 = norm(samples, squared=True, M=M)
-    centers_norm2 = samples_norm2 if samples is centers else norm(centers, squared=True, M=M)
+    samples_norm2 = norm(samples, squared=True, M=M, keepdim=True)
+    centers_norm2 = samples_norm2.T if (samples is centers) else norm(centers, squared=True, M=M, keepdim=False)
     
-    distances2 = ((samples_norm2 if len(centers_norm2.shape)==0 else samples_norm2.unsqueeze(-1)) 
-                + centers_norm2 
-                - 2 * inner_product(samples, centers, M=M)).clamp(min=0)
-    return distances2 if squared else distances2.sqrt()
+    distances = inner_product(samples, centers, M=M)
+    distances.mul_(-2)
+    distances.add_(samples_norm2)
+    distances.add_(centers_norm2)
+    if not squared:
+        distances.clamp_(min=0).sqrt_()
+    return distances
