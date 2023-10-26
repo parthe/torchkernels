@@ -16,20 +16,22 @@ class RadialKernel(Kernel):
     def __call__(self, samples, centers=None, M=None, **kwargs):
         if centers is None: 
             centers = samples
-        return super().__call__(
-            self.fn(euclidean(samples, centers, squared=self.squared, M=M).div(-self.bandwidth)), **kwargs)
+            matrix = euclidean(samples, centers, squared=self.squared, M=M)
+            matrix.div_(-self.bandwidth)
+            matrix.apply_(self.fn)
+        return matrix
 
 class LaplacianKernel(RadialKernel):
     def __init__(self, bandwidth=1.):
-        super().__init__(fn=lambda x: x.exp(), bandwidth=bandwidth, squared=False)
+        super().__init__(fn=lambda x: torch.exp(x), bandwidth=bandwidth, squared=False)
     
 class GaussianKernel(RadialKernel):
     def __init__(self, bandwidth=1.):
-        super().__init__(fn=lambda x: x.exp(), bandwidth=bandwidth, squared=True)
+        super().__init__(fn=lambda x: torch.exp(x), bandwidth=bandwidth, squared=True)
     
 class ExponentialPowerKernel(RadialKernel):
     def __init__(self, bandwidth=1.):
-        super().__init__(fn=lambda x: x.pow(power/2).exp(), bandwidth=bandwidth, squared=True)
+        super().__init__(fn=lambda x: torch.exp(torch.pow(power/2)), bandwidth=bandwidth, squared=True)
 
 def laplacian(samples, centers=None, bandwidth=1., M=None):
     '''
