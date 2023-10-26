@@ -18,6 +18,7 @@ class RadialKernel(Kernel):
             centers = samples
             matrix = euclidean(samples, centers, squared=self.squared, M=M)
             matrix.div_(-self.bandwidth)
+            if matrix.device=='cuda': raise NotImplementedError("Currently `torch.Tensor.apply_` is not supported on CUDA")
             matrix.apply_(self.fn)
         return matrix
 
