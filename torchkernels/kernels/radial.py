@@ -1,5 +1,6 @@
 from ..linalg import euclidean
 from .__init__ import Kernel
+import torch
 
 
 class RadialKernel(Kernel):
