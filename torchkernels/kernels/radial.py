@@ -16,10 +16,10 @@ class RadialKernel(Kernel):
     def __call__(self, samples, centers=None, M=None, **kwargs):
         if centers is None: 
             centers = samples
-            matrix = euclidean(samples, centers, squared=self.squared, M=M)
-            matrix.div_(-self.bandwidth)
-            if matrix.device=='cuda': raise NotImplementedError("Currently `torch.Tensor.apply_` is not supported on CUDA")
-            matrix.apply_(self.fn)
+        matrix = euclidean(samples, centers, squared=self.squared, M=M)
+        matrix.div_(-self.bandwidth)
+        if matrix.device=='cuda': raise NotImplementedError("Currently `torch.Tensor.apply_` is not supported on CUDA")
+        matrix.apply_(self.fn)
         return matrix
 
 class LaplacianKernel(RadialKernel):
