@@ -1,7 +1,7 @@
 import torch, os
 from torchvision.datasets import MNIST, EMNIST, FashionMNIST, KMNIST, CIFAR10
 from torch.nn.functional import one_hot
-from .printing import midrule
+
 
 def unit_range_normalize(samples):
     samples -= samples.min(dim=0, keepdim=True).values
@@ -81,6 +81,5 @@ def load_dataset(dataset='mnist',
     print(f"{n_class} classes")
     print(x_train.shape[0], 'train samples')
     print(x_test.shape[0], 'test samples')
-    print(midrule)
 
     return n_class, (x_train, y_train), (x_test, y_test)
