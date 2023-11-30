@@ -23,7 +23,7 @@ def fmm(f1, f2, X, Y, Z, out=None, row_chunk_size=None, col_chunk_size=None, mid
     return_flag = False
     if out is None:
         return_flag = True
-        out = torch.zeros(n_r, n_c)
+        out = torch.zeros(n_r, n_c, device=Z.device)
 
     for i in range(math.ceil(n_r/b_r)):
         for k in range(math.ceil(n_c/b_c)):
@@ -43,7 +43,7 @@ def KmV(K, X, Z, v, out=None, row_chunk_size=None, col_chunk_size=None):
     return_flag = False
     if out is None:
         return_flag = True
-        out = torch.zeros(n_r, *v.shape[1:])
+        out = torch.zeros(n_r, *v.shape[1:], device=v.device)
 
     for i in range(math.ceil(n_r/b_r)):
         for j in range(math.ceil(n_c/b_c)):
