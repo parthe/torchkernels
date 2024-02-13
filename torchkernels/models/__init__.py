@@ -1,8 +1,7 @@
-from .linalg.fmm import KmV
+import torch
+from ..linalg.fmm import KmV
 
-
-class KernelModel(nn.Module):
-    
+class KernelModel:
     def __init__(self, kernel_fn, centers, weights=None, tasks=None):
         self.kernel, self.centers = kernel_fn, centers
         self.size, self.dim = (len(centers), 1) if len(centers.shape)==1 else centers.shape
@@ -24,7 +23,7 @@ class KernelModel(nn.Module):
         """
         solves the kernel regression problem (K + reg*I) a = labels
         """
-        n, c = (len(y), 1) if len(labels.shape)==1 else labels.shape
+        n, c = (len(labels), 1) if len(labels.shape)==1 else labels.shape
         self.tasks = c if self.tasks is None else self.tasks
         assert n==self.size, "number of samples in (labels) and (self.centers) do not match"
         assert c==self.tasks, "number of tasks in (labels) and (self.tasks) do not match"
@@ -32,5 +31,5 @@ class KernelModel(nn.Module):
         self.weights = torch.linalg.solve(kmat + reg*torch.eye(n, dtype=kmat.dtype), labels.type(kmat.type()))
 
     def score(self, samples, labels, score_fn):
-        return score_fn(self.forward(samples), labels)
+        return score_fn(self.predict(samples), labels)
   

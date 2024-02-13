@@ -19,13 +19,13 @@ def top_eigensystem(K, X, q, method='scipy.linalg.eigh'):
     """
   
     n = X.shape[0]
-    scaled_kmat = K(X, X)/n
+    kmat = K(X, X)
     if method == "scipy.linalg.eigh":
-      L, E = scipy.linalg.eigh(scaled_kmat.cpu().numpy(), subset_by_index=[n-q-1,n-1])
-      L, E = torch.from_numpy(L).to(scaled_kmat.device).flipud(), torch.from_numpy(E).to(scaled_kmat.device).fliplr()
+        L, E = scipy.linalg.eigh(kmat.cpu().numpy(), subset_by_index=[n-q-1,n-1])
+        L, E = torch.from_numpy(L).to(kmat.device).flipud(), torch.from_numpy(E).to(kmat.device).fliplr()
     elif method == "torch.lobpcg":
-      L, E = torch.lobpcg(scaled_kmat, q+1)
-    beta = n * (scaled_kmat.diag() - (E[:,:q].pow(2)*(L[:q]-L[q])).sum(-1)).max()
+        L, E = torch.lobpcg(kmat, q+1)
+    beta = (kmat.diag() - (E[:,:q].pow(2)*(L[:q]-L[q])).sum(-1)).max()
   
     return E[:,:q], L[:q], L[q], beta
 
