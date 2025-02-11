@@ -11,7 +11,7 @@ import math
 torch.set_default_dtype(torch.float64)
 torch.manual_seed(0)
 
-K = LaplacianKernel(bandwidth=1.)
+K = LaplacianKernel(length_scale=1.)
 n, d, c, s, q = 1000, 3, 2, 100, 20
 epochs = 1000
 

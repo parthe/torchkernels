@@ -96,7 +96,7 @@ if __name__ == "__main__":
     torch.manual_seed(0)
     torch.set_default_dtype(torch.float64)
 
-    K = LaplacianKernel(bandwidth=1.)
+    K = LaplacianKernel(length_scale=1.)
     n, d, c = 1000, 3, 2
     X = torch.randn(n, d)
     y = torch.randn(n, c)
