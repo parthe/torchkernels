@@ -39,9 +39,9 @@ def RFF_w(p_feat, d_dim, Kernel="Laplace", length_scale=1., nu=None, alpha=None,
     """
     assert Kernel in ["Laplace", "Gauss", "Matern", "ExpPower"]
     if Kernel == "Laplace":
-        return torch.randn(d_dim,p_feat)*length_scale , torch.randn(p_feat)
+        return torch.randn(d_dim,p_feat)/length_scale , torch.randn(p_feat)
     elif Kernel =="Gauss":
-        return torch.randn(d_dim,p_feat)*length_scale , torch.ones(p_feat)
+        return torch.randn(d_dim,p_feat)/length_scale , torch.ones(p_feat)
     elif Kernel == "Matern":
         df=2*nu
         chi2_dist = Chi2(df=df)
@@ -90,17 +90,18 @@ class Random_Fourier_Features:
         self.Rf_bias = Rf_bias
         if not Rf_bias: p_feat = p_feat // 2
         self.W1, self.W2 = RFF_w(p_feat=p_feat, d_dim=self.d_dim, Kernel=self.kernel, length_scale=self.length_scale, nu=self.nu, alpha=self.alpha)
+        self.b = ((torch.rand(self.p_feat) * torch.pi * 2).to(DEVICE))  # On GPU
     def __call__(self, X_):
         W1 = self.W1.to(DEVICE)  # On GPU
         W2 = self.W2.to(DEVICE)  # On GPU
-        b = ((torch.rand(self.p_feat) * torch.pi * 2).to(DEVICE))  # On GPU
+
         c1 = (torch.sqrt(torch.tensor(2 / self.p_feat)).to(DEVICE))  # On GPU
         X_ = X_.to(DEVICE)  # On GPU
         if self.Rf_bias:
             if self.kernel in ['Laplace', 'Matern']:
-                return c1 * ((torch.mm(X_, W1)/W2) + b).cos()
+                return c1 * ((torch.mm(X_, W1)/W2) + self.b).cos()   
             elif self.kernel in ['Gauss', 'ExpPower']:
-                return c1 * ((torch.mm(X_, W1)*W2) + b).cos()
+                return c1 * ((torch.mm(X_, W1)*W2) + self.b).cos()
         else:
             if self.kernel in ['Laplace', 'Matern']:
                 return c1 * torch.cat([(torch.mm(X_, W1)/W2).cos(), (torch.mm(X_, W1)/W2).sin()], dim=-1)

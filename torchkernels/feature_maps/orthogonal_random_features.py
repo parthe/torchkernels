@@ -71,7 +71,7 @@ def radial_CMS(p_feat, d_dim, alpha, length_scale=1.):
     # Generate radial CMS given alpha, bw (bandwidth)
         x = CMS_sampling(p=p_feat, alpha=alpha, length_scale=length_scale)
         y = stats.chi.rvs(d_dim, size=p_feat)
-        return x*y
+        return np.sqrt(x)*y
 
 class Orthogonal_Random_Features:
     def __init__(self, p_feat, d_dim, kernel="Laplace", Rf_bias:bool=False, length_scale=1., nu=None, alpha=None):
