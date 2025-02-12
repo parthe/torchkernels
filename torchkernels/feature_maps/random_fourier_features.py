@@ -1,4 +1,4 @@
-from __init__ import CMS_sampling
+from .__init__ import CMS_sampling
 import torch
 from torch.distributions.chi2 import Chi2
 import scipy.stats as stats
@@ -48,9 +48,66 @@ def RFF_w(p_feat, d_dim, Kernel="Laplace", length_scale=1., nu=None, alpha=None,
         chi2_samples = chi2_dist.sample((p_feat,))/(2*nu)
         return torch.randn(d_dim,p_feat)/length_scale , torch.sqrt(chi2_samples)
     elif Kernel == "ExpPower":
-        return torch.randn(d_dim,p_feat), torch.sqrt(CMS_sampling(n=p_feat, d=d_dim, alpha=alpha, length_scale=length_scale))
+        return torch.randn(d_dim,p_feat), torch.sqrt(torch.from_numpy(CMS_sampling(p=p_feat,  alpha=alpha, length_scale=length_scale)))
     
-def create_RFF(p_feat, X_, kernel='Laplace', Rf_bias:bool=False, length_scale:float=1., nu=None, alpha=None) -> torch.tensor:
+class Random_Fourier_Features:
+    def __init__(self, p_feat, d_dim, kernel="Laplace", Rf_bias:bool=False, length_scale=1., nu=None, alpha=None):
+        """
+        Initializes the class for creating Random Fourier Features
+        
+        Parameters
+        ----------
+        p_feat : int    
+            Number of random features.
+        d_dim : int
+            dimension of underlying dataset 
+        kernel : str
+            Kernel type, options are ['Laplace', 'Gauss', 'Matern', 'ExpPower']
+        Rf_bias : bool, optional
+            Whether to include a bias term in the random features. Defaults to False.
+        length_scale : float, >0
+            length_scale for the kernel, strictly greater than 0.
+        nu : float, optional
+            shape parameter for Matern kernel, required if kernel is 'Matern'.
+        alpha : float, optional
+            stability parameter for ExpPower kernel, required if kernel is 'ExpPower'.
+        """
+        
+        assert kernel in ["Laplace", "Gauss", "Matern", "ExpPower"]
+        if kernel == "Matern": assert nu is not None
+        if kernel == "ExpPower": 
+            assert alpha is not None
+            assert 0 < alpha <= 2
+            if alpha==1: raise NotImplementedError("alpha = 1 is Laplace Kernel use that instead")
+            if alpha==2: raise NotImplementedError("alpha = 2 is Gaussian Kernel use that instead")
+        
+        self.p_feat = p_feat
+        self.d_dim = d_dim
+        self.kernel = kernel
+        self.length_scale = length_scale
+        self.nu = nu
+        self.alpha = alpha
+        self.Rf_bias = Rf_bias
+        if not Rf_bias: p_feat = p_feat // 2
+        self.W1, self.W2 = RFF_w(p_feat=p_feat, d_dim=self.d_dim, Kernel=self.kernel, length_scale=self.length_scale, nu=self.nu, alpha=self.alpha)
+    def __call__(self, X_):
+        W1 = self.W1.to(DEVICE)  # On GPU
+        W2 = self.W2.to(DEVICE)  # On GPU
+        b = ((torch.rand(self.p_feat) * torch.pi * 2).to(DEVICE))  # On GPU
+        c1 = (torch.sqrt(torch.tensor(2 / self.p_feat)).to(DEVICE))  # On GPU
+        X_ = X_.to(DEVICE)  # On GPU
+        if self.Rf_bias:
+            if self.kernel in ['Laplace', 'Matern']:
+                return c1 * ((torch.mm(X_, W1)/W2) + b).cos()
+            elif self.kernel in ['Gauss', 'ExpPower']:
+                return c1 * ((torch.mm(X_, W1)*W2) + b).cos()
+        else:
+            if self.kernel in ['Laplace', 'Matern']:
+                return c1 * torch.cat([(torch.mm(X_, W1)/W2).cos(), (torch.mm(X_, W1)/W2).sin()], dim=-1)
+            elif self.kernel in ['Gauss', 'ExpPower']:
+                return c1 * torch.cat([(torch.mm(X_, W1)*W2).cos(), (torch.mm(X_, W1)*W2).sin()], dim=-1)
+
+def create_RFF(W1, W2, X_, kernel='Laplace', Rf_bias:bool=False, length_scale:float=1., nu=None, alpha=None) -> torch.tensor:
     """
     Generate random features using Orthogonal Random Features (ORF) method.
 
