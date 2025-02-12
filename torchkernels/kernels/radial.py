@@ -66,8 +66,7 @@ def exp_power(samples, centers=None, length_scale=1., alpha=1., M=None):
     if centers is None: centers = samples
     kernel_mat = euclidean(samples, centers, squared=True, M=M)
     kernel_mat.pow_(alpha /2.)
-    kernel_mat.div_(length_scale**alpha)
-    kernel_mat.neg_()
+    kernel_mat.div_(-length_scale**alpha)
     kernel_mat.exp_()
     return kernel_mat
     
@@ -76,13 +75,12 @@ def matern(samples, centers=None, length_scale=1., nu=1., M=None):
     X = samples.cpu().numpy()
     Z = centers.cpu().numpy()
     kernel = Matern(length_scale=length_scale, nu=nu)
-    K_mat = kernel.__call__(X, Z)
+    K_mat = kernel(X, Z)
     del X, Z
     return torch.from_numpy(K_mat).to(torch.float32)
 
 
 # Aliases
 exponential_power = exp_power
-dispersal = exp_power
 rbf = gaussian
 laplace = laplacian
