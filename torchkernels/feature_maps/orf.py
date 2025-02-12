@@ -7,6 +7,9 @@ class ORF:
   def __call__(x):
     return (x @ self.Q) * self.S
 
+  def set_Q(Q):
+    self.Q = Q
+
   def set_S():
     raise NotImplementedError(
       "This method must be implemented in the subclass")
