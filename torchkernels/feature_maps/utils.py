@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.stats as stats
+
 def CMS_sampling(p, alpha, length_scale=1.):
     r"""
     Generate radial CMS given alpha, length_scale and dimension d. Samples generated are from $S(\alpha/2, 1, $2 \gamma^2 (cos(\pi \alpha/2))^(2/\alpha)$, 0)

@@ -56,6 +56,7 @@ def euclidean(samples, centers, squared=False, M=None):
     distances.mul_(-2)
     distances.add_(samples_norm2)
     distances.add_(centers_norm2)
+    distances.clamp_(min=0)
     if not squared:
-        distances.clamp_(min=0).sqrt_()
+        distances.sqrt_()
     return distances

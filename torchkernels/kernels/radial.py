@@ -66,7 +66,7 @@ def exp_power(samples, centers=None, length_scale=1., alpha=1., M=None):
     if centers is None: centers = samples
     kernel_mat = euclidean(samples, centers, squared=True, M=M)
     kernel_mat.pow_(alpha /2.)
-    kernel_mat.div_(-length_scale**alpha)
+    kernel_mat.div_(-(length_scale**alpha))
     kernel_mat.exp_()
     return kernel_mat
     
