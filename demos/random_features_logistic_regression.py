@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 import os
-from ..feature_maps.laplacian import LaplacianRFF
+from torchkernels.feature_maps import LaplacianRFF
 from torchmetrics.classification import Accuracy, CalibrationError
 
 class LogisticRegressionRidge(nn.Module):

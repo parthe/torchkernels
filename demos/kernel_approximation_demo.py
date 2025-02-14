@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from ..feature_maps.laplacian import LaplacianORF, LaplacianRFF
-from ..feature_maps.gaussian import GaussianORF, GaussianRFF
-from ..feature_maps.matern import MaternORF, MaternRFF
-from ..feature_maps.exp_power import ExpPowerORF, ExpPowerRFF
-from ..kernels.radial import laplacian, gaussian, exp_power, matern
+from torchkernels.feature_maps import (
+    LaplacianORF, LaplacianRFF,
+    GaussianORF, GaussianRFF,
+    MaternORF, MaternRFF,
+    ExpPowerORF, ExpPowerRFF
+    )
+from torchkernels.kernels.radial import laplacian, gaussian, exp_power, matern
 import numpy as np
 import torch
 
