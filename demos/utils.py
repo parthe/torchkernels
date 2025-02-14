@@ -4,6 +4,14 @@ import torch
 import numpy as np
 from torchkernels.kernels.radial import laplacian, gaussian, exp_power, matern
 
+plt.rcParams.update({
+        "text.usetex": False,
+        "font.family": "serif",
+        "mathtext.fontset": "cm",
+        "mathtext.rm": "serif",
+    })
+
+
 class SubplotManager:
     def __init__(self, rows, cols, kernels):
         self.rows = rows
@@ -57,7 +65,8 @@ def create_kernel_str(kernel:str, nu:float = 1.5, alpha:float = 0.7):
     else:
         return kernel
     
-def create_x1_x2_list(input_dim:int, length_scale:float=1., nu:float=1.5, alpha:float=0.7, N:int=20, start:float=0, end:float=5):
+
+def create_x1_x2_list(input_dim:int, N:int=20, start:float=0, end:float=5):
     x1_x2_norm = np.linspace(start, end, N)
     x1_list = []
     x2_list = []
@@ -72,7 +81,8 @@ def create_x1_x2_list(input_dim:int, length_scale:float=1., nu:float=1.5, alpha:
         x2_list.append(x2)
     return x1_list, x2_list, x1_x2_norm
 
-def create_Kmat_exact(kernels, x1_list:list, x2_list:list, length_scale:float=1., nu:float=1.5, alpha:float=0.7):
+
+def create_Kmat_exact(kernels:list, x1_list:list, x2_list:list, length_scale:float=1., nu:float=1.5, alpha:float=0.7):
     K_func_exact = {"Laplacian": laplacian, "Gaussian": gaussian, "Matern": matern, "ExpPower": exp_power}
     K_mat_dict = {}
     for kernel in kernels:
@@ -86,15 +96,16 @@ def create_Kmat_exact(kernels, x1_list:list, x2_list:list, length_scale:float=1.
                 K_mat_dict[kernel].append(K_func_exact[kernel](x1, x2, length_scale=length_scale)[0].item())
     return K_mat_dict
 
-def create_plots(kernels, approximations, K_mat_exact_dict:dict, K_mat_approx_dict:dict, x1_x2_norm:np.ndarray, kernel_str_dict:str):
+
+def create_plots(kernels, approximations, K_exact_dict:dict, K_approx_dict:dict, x1_x2_norm:np.ndarray, kernel_str_dict:str):
     with SubplotManager(rows=2, cols=4, kernels=kernels) as manager:
         for col, kernel in enumerate(kernels):  # Each kernel gets a column
             color = manager.colors[col]  # Pick color from Husl palette
             scatter_color = manager.scatter_colors[col] #Pick scatter color from Coolwarm palette
             for row, approx in enumerate(approximations):  # Approximation types in rows
                 manager.next_subplot(row, col, title=f"{kernel_str_dict[kernel]} - {approx}")
-                K_mat_exact = K_mat_exact_dict[kernel]
-                K_mat_approx = K_mat_approx_dict[kernel][approx]
+                K_mat_exact = K_exact_dict[kernel]
+                K_mat_approx = K_approx_dict[kernel][approx]
                 plt.plot(x1_x2_norm, K_mat_exact, color=color, linewidth=2, label='Exact', alpha=0.5)
                 plt.scatter(x1_x2_norm, K_mat_approx, color=scatter_color, marker='+', label="Approximation")
                 # Optional: Show legend only in the first subplot
@@ -104,3 +115,48 @@ def create_plots(kernels, approximations, K_mat_exact_dict:dict, K_mat_approx_di
                     plt.xlabel(r"$||x_1 - x_2||$", fontsize=12)
                 if col == 0:
                     plt.ylabel(r"$K(x_1, x_2)$", fontsize=12)
+
+
+def plot_kernel_approximation(x, y1, y2, kernel_str):
+    """
+    Plots a single kernel approximation with line and scatter plots.
+
+    Parameters:
+        x (list or array): X-axis values.
+        y1 (list or array): Y-axis values for the first scatter plot.
+        y2 (list or array): Y-axis values for the second scatter plot.
+    """
+
+    # Apply LaTeX-like styling without full LaTeX rendering
+    plt.rcParams.update({
+        "text.usetex": False,
+        "font.family": "serif",
+        "mathtext.fontset": "cm",
+        "mathtext.rm": "serif",
+    })
+    plt.rcParams['font.family'] = "serif"
+
+    # Set Seaborn style
+    sns.set_style("whitegrid")
+
+    # Define colors
+    line_color = sns.color_palette("husl", 1)[0]
+    scatter_color = sns.color_palette("icefire", 1)[0]
+
+    # Plot line and scatter points
+    plt.plot(x, y1, color=line_color, linewidth=2, label="Exact", alpha=0.5)
+    plt.scatter(x, y1, color=scatter_color, marker="+", label="Approximation", s=50)
+    plt.xlabel(r"$||x_1 - x_2||$", fontsize=12)
+    plt.ylabel(r"$K(x_1, x_2)$", fontsize=12)
+
+    # Set title and grid
+    plt.title(f"{kernel_str}", fontname="serif",  fontsize=12)
+    plt.grid(True)
+    import matplotlib.font_manager as font_manager
+    font = font_manager.FontProperties(family='serif', style='normal', size=10)
+    # Add legend
+    plt.legend(prop=font)
+
+    # Show plot
+    plt.show()
+
