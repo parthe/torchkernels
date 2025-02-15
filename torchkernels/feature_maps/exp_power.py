@@ -27,8 +27,8 @@ class ExpPowerORF(ORF):
 		"""
 		assert alpha is not None
 		assert alpha > 0 and alpha < 2
-		if alpha==1: raise NotImplementedError("alpha = 1 is Laplace Kernel use that instead")
-		if alpha==2: raise NotImplementedError("alpha = 2 is Gaussian Kernel use that instead")
+		if alpha==1: raise NotImplementedError("alpha = 1 is Laplacian kernel use that instead")
+		if alpha==2: raise NotImplementedError("alpha = 2 is Gaussian kernel use that instead")
 		self.alpha = alpha
 		super().__init__(*args, **kwargs)
 
@@ -50,7 +50,10 @@ class ExpPowerRFF(RFF):
 		super().__init__(*args, **kwargs)
 
 	def set_W2(self):
-		self.W2 = torch.from_numpy(np.sqrt(CMS_sampling(p=self.num_features,  alpha=self.alpha, length_scale=1.))).to(self.device)
+		self.W2 = torch.from_numpy(
+			np.sqrt(
+				CMS_sampling(p=self.num_features,  alpha=self.alpha, length_scale=1.)
+			)).to(self.device)
 
 	def test_set_W2(self, W2):
 		self.W2 = W2
