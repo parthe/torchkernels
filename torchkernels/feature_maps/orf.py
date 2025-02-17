@@ -3,21 +3,26 @@ import scipy.stats as stats
 import torch
 
 class ORF:
-	def __init__(self, input_dim:int, num_features:int, length_scale:float=1., bias_term:bool=False, device:str=None):
+	def __init__(self, 
+		input_dim:int, 
+		num_features:int, 
+		length_scale:float=1., 
+		bias_term:bool=False, 
+		device:str=None):
 		"""Initialize an instance of the ORF class.
 		
 		Parameters
 		----------
 		input_dim : int
-		    Input dimension of the data.
+		  input dimension of the data.
 		num_features : int
-		    Number of random features to generate.
+		  number of random features to generate.
 		length_scale : float
-		    Kernel length scale, defaults to 1.
+		  kernel length scale, defaults to 1.
 		bias_term : bool
-		    Whether to include a bias term in the random features, defaults to False.
+		  whether to include a bias term in the random features, defaults to False.
 		device : str
-		    Which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
+		  which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
 		"""
 		self.input_dim = input_dim
 		self.num_features = num_features
@@ -50,8 +55,9 @@ class ORF:
 		else:
 			return self.c1 * torch.cat([(torch.mm(x, self.Q)*self.S).cos(), (torch.mm(x, self.Q)*self.S).sin()], dim=-1)
 
-	def set_Q(self, Q):
-		self.Q = Q
+	def set_Q(self, Q=None):
+		if Q is not None:
+			self.Q = Q
 
 	def set_S(self):
 		raise NotImplementedError("This method must be implemented in the subclass")

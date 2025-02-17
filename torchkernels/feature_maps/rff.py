@@ -2,19 +2,23 @@ import torch
 
 class RFF:
 
-	def __init__(self, input_dim:int, num_features:int, length_scale:float=1., bias_term:bool=False):	
+	def __init__(self, 
+		input_dim:int, 
+		num_features:int, 
+		length_scale:float=1., 
+		bias_term:bool=False):	
 		"""Initialize an instance of the RFF class.
 
 		Parameters
 		----------
 		input_dim : int
-			Input dimension of the data.
+			input dimension of the data.
 		num_features : int
-			Number of random features to generate.
+			number of random features to generate.
 		length_scale : float
-			Kernel length scale, defaults to 1.
+			kernel length scale, defaults to 1.
 		bias_term : bool
-			Whether to include a bias term in the random features, defaults to False.
+			whether to include a bias term in the random features, defaults to False.
 		"""
 		self.input_dim = input_dim
 		self.num_features = num_features
@@ -25,7 +29,7 @@ class RFF:
 		if not self.bias_term:
 			self.num_features = self.num_features//2
 
-		self.W1 = (torch.randn(self.input_dim,self.num_features)/self.length_scale).to(self.device)
+		self.W1 = (torch.randn(self.input_dim,self.num_features,device=self.device)/self.length_scale)
 		self.set_W2()
 		if self.bias_term:
 			self._bias = (torch.rand(self.num_features) * torch.pi * 2).to(self.device)
@@ -34,8 +38,9 @@ class RFF:
 		x = x.to(self.device)
 		return self.apply_W2(torch.mm(x, self.W1))
 
-	def set_W1(self, W1):
-		self.W1 = W1
+	def set_W1(self, W1=None):
+		if W1 is not None:
+			self.W1=W1
 
 	def set_W2(self):
 		raise NotImplementedError("This method must be implemented in the subclass")
