@@ -8,7 +8,7 @@ X = torch.randn(n,d).to(DEVICE)
 Q = torch.randn(d,p).to(DEVICE)
 S = torch.randn(p).to(DEVICE)
 feature_map.set_Q(Q)
-feature_map.test_set_S(S)
+feature_map.set_S(S)
 
 Phi = feature_map.c1.to('cpu') * torch.cat([(torch.mm(X, Q)*S).cos(), (torch.mm(X, Q)*S).sin()], dim=-1)
 if torch.allclose(feature_map(X), Phi):
@@ -20,7 +20,7 @@ X = torch.randn(n,d).to(DEVICE)
 W1 = torch.randn(d,p).to(DEVICE)
 W2 = torch.randn(p).to(DEVICE)
 feature_map.set_W1(W1)
-feature_map.test_set_W2(W2)
+feature_map.set_W2(W2)
 Phi = feature_map.c1.to('cpu') * torch.cat([(torch.mm(X, W1)/W2).cos(), (torch.mm(X, W1)/W2).sin()], dim=-1)
 if torch.allclose(feature_map(X), Phi):
     print("Laplace RFF test complete")

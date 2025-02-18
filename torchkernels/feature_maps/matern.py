@@ -31,11 +31,13 @@ class MaternORF(ORF):
 		super().__init__(*args, **kwargs)
 
 
-	def set_S(self):
-		self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2, self.nu, size=self.num_features))/self.length_scale*np.sqrt(2*self.nu)).to(self.device)
+	def set_S(self, S=None):
+		if S is not None:
+			self.S=S
+		else:
+			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2, self.nu, size=self._num_features))
+                             /self.length_scale*np.sqrt(2*self.nu)).to(self.device)
 
-	def test_set_S(self, S):
-		self.S = S
 
 class MaternRFF(RFF):
 	def __init__(self, *args, nu:float=None, **kwargs):
@@ -44,15 +46,14 @@ class MaternRFF(RFF):
 		self.nu = nu
 		super().__init__(*args, **kwargs)
 
-
-	def set_W2(self):
-		df=2*self.nu
-		chi2_dist = Chi2(df=df)
-		chi2_samples = chi2_dist.sample((self.num_features,))/(2*self.nu)
-		self.W2 = torch.sqrt(chi2_samples).to(self.device)
-
-	def test_set_W2(self, W2):
-		self.W2 = W2
+	def set_W2(self, W2=None):
+		if W2 is not None:
+			self.W2=W2
+		else:
+			df=2*self.nu
+			chi2_dist = Chi2(df=df)
+			chi2_samples = chi2_dist.sample((self._num_features,))/(2*self.nu)
+			self.W2 = torch.sqrt(chi2_samples).to(self.device)
 
 	def apply_W2(self, XW1):
 		if self.bias_term:

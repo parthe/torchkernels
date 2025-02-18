@@ -35,8 +35,8 @@ class ExpPowerORF(ORF):
 		if S is not None:
 			self.S=S
 		else:
-			CMS_samples = CMS_sampling(p=self.num_features, alpha=self.alpha, length_scale=self.length_scale)
-			Chi_samples = stats.chi.rvs(self.input_dim, size=self.num_features)
+			CMS_samples = CMS_sampling(p=self._num_features, alpha=self.alpha, length_scale=self.length_scale)
+			Chi_samples = stats.chi.rvs(self.input_dim, size=self._num_features)
 			self.S = torch.from_numpy(np.sqrt(CMS_samples)*Chi_samples).to(self.device) 
 
 
@@ -55,7 +55,7 @@ class ExpPowerRFF(RFF):
 		else:
 			self.W2 = torch.from_numpy(
 				np.sqrt(
-					CMS_sampling(p=self.num_features,  alpha=self.alpha, length_scale=1.)
+					CMS_sampling(p=self._num_features,  alpha=self.alpha, length_scale=1.)
 				)).to(self.device)
 
 	def apply_W2(self, XW1):

@@ -34,19 +34,21 @@ class ORF:
 			self.device = torch.device(device)
 		self.c1 = (torch.sqrt(torch.tensor(2 / self.num_features)).to(self.device))
 		if not self.bias_term:
-			self.num_features = self.num_features//2
+			self._num_features = self.num_features//2
+		else: 
+			self._num_features = self.num_features
 
 		Q_arr = []
-		for _ in range(int(np.ceil(self.num_features/self.input_dim))):
+		for _ in range(int(np.ceil(self._num_features/self.input_dim))):
 			Q = stats.ortho_group.rvs(dim=self.input_dim)
 			Q_arr.append(Q)
-		self.Q = np.concatenate(Q_arr, axis=0)[:self.num_features].T
+		self.Q = np.concatenate(Q_arr, axis=0)[:self._num_features].T
 		del Q_arr
-		self.Q = torch.from_numpy(self.Q).to(torch.float32).to(self.device)
+		self.Q = torch.from_numpy(self.Q).float().to(self.device)
 
 		self.set_S()
 		if self.bias_term:
-			self._bias = ((torch.rand(self.num_features) * torch.pi * 2).to(self.device))
+			self._bias = ((torch.rand(self._num_features) * torch.pi * 2).to(self.device))
 
 	def __call__(self, x):
 		x = x.to(self.device)
