@@ -17,6 +17,8 @@ class ExpPowerORF(ORF):
 			number of random features to generate.
 		length_scale : float
 			kernel length scale, defaults to 1.
+		shape_matrix : torch.Tensor
+			shape matrix for random features, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
 		bias_term : bool
 			whether to include a bias term in the random features, defaults to False.
 		device : str
@@ -42,6 +44,25 @@ class ExpPowerORF(ORF):
 
 class ExpPowerRFF(RFF):
 	def __init__(self, *args, alpha:float=None, **kwargs):
+		"""Initialize an instance of the RFF class.
+		
+		Parameters
+		----------
+		input_dim : int
+			input dimension of the data.
+		num_features : int
+			number of random features to generate.
+		length_scale : float
+			kernel length scale, defaults to 1.
+		shape_matrix : torch.Tensor
+			shape matrix for random features, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
+		bias_term : bool
+			whether to include a bias term in the random features, defaults to False.
+		device : str
+			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
+		alpha : float
+			stability parameter for the ExpPower kernel, must be between 0 and 2, both not included. Defaults to None.
+		"""
 		assert alpha is not None
 		assert alpha > 0 and alpha < 2
 		if alpha==1: raise NotImplementedError("alpha = 1 is Laplace kernel. use torchkernels.feature_maps.LaplacianRFF")

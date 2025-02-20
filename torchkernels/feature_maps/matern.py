@@ -18,6 +18,8 @@ class MaternORF(ORF):
 			Number of random features to generate.
 		length_scale : float
 			Kernel length scale, defaults to 1.
+		shape_matrix : torch.Tensor
+			Shape matrix for the Matern kernel, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
 		bias_term : bool
 			Whether to include a bias term in the random features, defaults to False.
 		device : str
@@ -41,6 +43,25 @@ class MaternORF(ORF):
 
 class MaternRFF(RFF):
 	def __init__(self, *args, nu:float=None, **kwargs):
+		"""Initialize an instance of the RFF class.
+		
+		Parameters
+		----------
+		input_dim : int
+			Input dimension of the data.
+		num_features : int
+			Number of random features to generate.
+		length_scale : float
+			Kernel length scale, defaults to 1.
+		shape_matrix : torch.Tensor
+			Shape matrix for the Matern kernel, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
+		bias_term : bool
+			Whether to include a bias term in the random features, defaults to False.
+		device : str
+			Which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
+		nu : float
+			Smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
+		"""
 		assert nu is not None
 		assert nu>0
 		self.nu = nu
