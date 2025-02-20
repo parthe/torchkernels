@@ -29,5 +29,3 @@ feature_map.set_W2(W2) #Gaussian only requires W1 in RFF, W2 is not used
 Phi = feature_map.c1.to('cpu') * torch.cat([(torch.mm(X@L, W1)).cos(), (torch.mm(X@L, W1)).sin()], dim=-1)
 if torch.allclose(feature_map(X), Phi, atol=1e-4):
     print("Gaussian RFF test complete")
-else:
-    print(feature_map(X), Phi)
