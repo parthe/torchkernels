@@ -13,19 +13,19 @@ class MaternORF(ORF):
 		Parameters
 		----------
 		input_dim : int
-			Input dimension of the data.
+			input dimension of the data.
 		num_features : int
-			Number of random features to generate.
+			number of random features to generate.
 		length_scale : float
-			Kernel length scale, defaults to 1.
+			kernel length scale, defaults to 1.
 		shape_matrix : torch.Tensor
-			Shape matrix for the Matern kernel, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
+			shape matrix for the Matern kernel, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
 		bias_term : bool
-			Whether to include a bias term in the random features, defaults to False.
+			whether to include a bias term in the random features, defaults to False.
 		device : str
-			Which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
+			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
 		nu : float
-			Smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
+			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
 		"""
 		assert nu is not None
 		assert nu>0
@@ -48,19 +48,19 @@ class MaternRFF(RFF):
 		Parameters
 		----------
 		input_dim : int
-			Input dimension of the data.
+			input dimension of the data.
 		num_features : int
-			Number of random features to generate.
+			number of random features to generate.
 		length_scale : float
-			Kernel length scale, defaults to 1.
+			kernel length scale, defaults to 1.
 		shape_matrix : torch.Tensor
-			Shape matrix for the Matern kernel, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
+			shape matrix for the Matern kernel, defaults to None. shape matrix entered must be symmetric, positive definite and of dimension d x d where d is input dimension.
 		bias_term : bool
-			Whether to include a bias term in the random features, defaults to False.
+			whether to include a bias term in the random features, defaults to False.
 		device : str
-			Which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
+			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
 		nu : float
-			Smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
+			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
 		"""
 		assert nu is not None
 		assert nu>0
