@@ -42,3 +42,4 @@ print('Laplacian test complete!')
 
 ## Other utilities
 - top eigenvectors of kernel matrix
+- Random feature maps for the Laplacian, Gaussian, Matern and the ExpPower kernel
