@@ -28,7 +28,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from torchkernels.kernels.radial import LaplacianKernel
     
-    K = LaplacianKernel(bandwidth=1.)
+    K = LaplacianKernel(length_scale=1.)
 
     n, d, k = 100, 2, 20
     X = torch.randn(n, d)
