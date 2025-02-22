@@ -3,7 +3,7 @@ Fast implementations of standard utilities
 
 # Installation
 ```
-pip install -I git+https://github.com/parthe/torchkernels@random-features
+pip install -I git+https://github.com/parthe/torchkernels
 ```
 Requires a PyTorch installation
 
