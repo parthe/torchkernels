@@ -76,8 +76,6 @@ class MaternRFF(RFF):
 			self.W2=W2
 		else:
 			df=2*self.nu
-			# chi2_dist = Chi2(df=df, dtype=self.float_type)
-			# chi2_samples = chi2_dist.sample((self._num_features,))/(2*self.nu)
 			chi2_samples = stats.chi2.rvs(df=df, size=(self._num_features,))/(2*self.nu)
 			self.W2 = torch.sqrt(torch.from_numpy(chi2_samples)).to(self.float_type).to(self.device)
 
