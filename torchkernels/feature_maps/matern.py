@@ -24,6 +24,8 @@ class MaternORF(ORF):
 			whether to include a bias term in the random features, defaults to False.
 		device : str
 			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
+		float_type : torch.dtype
+			float type to use, defaults to torch.float64.
 		nu : float
 			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
 		"""
@@ -38,7 +40,7 @@ class MaternORF(ORF):
 			self.S=S
 		else:
 			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2, self.nu, size=self._num_features))
-                             /self.length_scale*np.sqrt(2*self.nu)).to(self.device)
+                             /self.length_scale*np.sqrt(2*self.nu)).to(self.float_type).to(self.device)
 
 
 class MaternRFF(RFF):
@@ -59,6 +61,8 @@ class MaternRFF(RFF):
 			whether to include a bias term in the random features, defaults to False.
 		device : str
 			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
+		float_type : torch.dtype
+			float type to use, defaults to torch.float64.
 		nu : float
 			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
 		"""
@@ -72,9 +76,10 @@ class MaternRFF(RFF):
 			self.W2=W2
 		else:
 			df=2*self.nu
-			chi2_dist = Chi2(df=df)
-			chi2_samples = chi2_dist.sample((self._num_features,))/(2*self.nu)
-			self.W2 = torch.sqrt(chi2_samples).to(self.device)
+			# chi2_dist = Chi2(df=df, dtype=self.float_type)
+			# chi2_samples = chi2_dist.sample((self._num_features,))/(2*self.nu)
+			chi2_samples = stats.chi2.rvs(df=df, size=(self._num_features,))/(2*self.nu)
+			self.W2 = torch.sqrt(torch.from_numpy(chi2_samples)).to(self.float_type).to(self.device)
 
 	def apply_W2(self, XW1):
 		if self.bias_term:

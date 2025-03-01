@@ -11,7 +11,8 @@ class LaplacianORF(ORF):
 		if S is not None:
 			self.S=S
 		else:
-			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2,1/2, size=self._num_features))/self.length_scale).float().to(self.device)
+			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2,1/2, size=self._num_features))/
+                             self.length_scale).to(self.float_type).to(self.device)
 
 
 class LaplacianRFF(RFF):
@@ -20,7 +21,7 @@ class LaplacianRFF(RFF):
 		if W2 is not None:
 			self.W2=W2
 		else:
-			self.W2 = torch.randn(self._num_features).to(self.device)
+			self.W2 = torch.randn(self._num_features, dtype=self.float_type).to(self.device)
 
 	def apply_W2(self, XW1):
 		if self.bias_term:
