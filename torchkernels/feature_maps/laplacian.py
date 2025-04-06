@@ -13,7 +13,18 @@ class LaplacianORF(ORF):
 		else:
 			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2,1/2, size=self._num_features))/
                              self.length_scale).to(self.float_type).to(self.device)
+   
 
+class LaplacianORF_QMC(ORF):
+
+	def set_S(self, S=None):
+		if S is not None:
+			self.S=S
+		else:
+			sampler = stats.qmc.Halton(d=1, scramble=True)
+			u = sampler.random(self._num_features).flatten()
+			samples = stats.betaprime.ppf(u, self.input_dim/2, 1/2)
+			self.S = torch.from_numpy(np.sqrt(samples)/self.length_scale).to(self.float_type).to(self.device)
 
 class LaplacianRFF(RFF):
 
