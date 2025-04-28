@@ -1,5 +1,6 @@
 import torch
 import math
+import numpy as np
 
 class RFF:
 
@@ -10,7 +11,8 @@ class RFF:
 		shape_matrix:torch.Tensor=None,
 		bias_term:bool=False, 
 		device:str=None,
-		float_type=torch.float32):	
+		float_type=torch.float32,
+		seed:int = None):	
 		"""Initialize an instance of the RFF class.
 
 		Parameters
@@ -29,6 +31,8 @@ class RFF:
 			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
 		float_type : torch.dtype
 			float type to use, defaults to torch.float32.
+		seed : int
+		  seed, type int. Defaults to None.
 		"""
 		if device is None:
 			self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -38,6 +42,7 @@ class RFF:
 		self.num_features = num_features
 		self.length_scale = length_scale
 		self.float_type = float_type
+		self.seed = seed
 	
 		if shape_matrix is not None:
 			self.shape_matrix = shape_matrix.to(self.float_type)
@@ -53,8 +58,10 @@ class RFF:
 			self._num_features = self.num_features//2
 		else: 
 			self._num_features = self.num_features
-
-		self.W1 = (torch.randn(self.input_dim,self._num_features,device=self.device, dtype=self.float_type)
+		if self.seed is not None:
+			self.torch_gen = torch.Generator(device=self.device).manual_seed(self.seed)
+		else: self.torch_gen = torch.Generator(device=self.device)
+		self.W1 = (torch.randn(self.input_dim,self._num_features,device=self.device, dtype=self.float_type, generator=self.torch_gen)
              /self.length_scale).to(self.float_type)
 		self.set_W2()
 		if self.bias_term:

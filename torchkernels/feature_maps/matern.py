@@ -28,6 +28,8 @@ class MaternORF(ORF):
 			float type to use, defaults to torch.float64.
 		nu : float
 			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
+		seed : int
+		  seed, type int. Defaults to None.
 		"""
 		assert nu is not None
 		assert nu>0
@@ -39,7 +41,7 @@ class MaternORF(ORF):
 		if S is not None:
 			self.S=S
 		else:
-			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2, self.nu, size=self._num_features))
+			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2, self.nu, size=self._num_features, random_state = self.seed))
                              /self.length_scale*np.sqrt(2*self.nu)).to(self.float_type).to(self.device)
 
 
@@ -65,6 +67,8 @@ class MaternRFF(RFF):
 			float type to use, defaults to torch.float64.
 		nu : float
 			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
+		seed : int
+		  seed, type int. Defaults to None.
 		"""
 		assert nu is not None
 		assert nu>0
@@ -76,7 +80,7 @@ class MaternRFF(RFF):
 			self.W2=W2
 		else:
 			df=2*self.nu
-			chi2_samples = stats.chi2.rvs(df=df, size=(self._num_features,))/(2*self.nu)
+			chi2_samples = stats.chi2.rvs(df=df, size=(self._num_features,), random_state=self.seed)/(2*self.nu)
 			self.W2 = torch.sqrt(torch.from_numpy(chi2_samples)).to(self.float_type).to(self.device)
 
 	def apply_W2(self, XW1):

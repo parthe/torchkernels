@@ -2,6 +2,7 @@ from .orf import ORF
 from .rff import RFF
 import scipy.stats as stats
 import numpy as np
+from numpy.random import default_rng
 import torch
 
 
@@ -10,7 +11,7 @@ class GaussianORF(ORF):
 		if S is not None:
 			self.S=S
 		else:
-			self.S = torch.from_numpy(stats.chi.rvs(self.input_dim,size=self._num_features)
+			self.S = torch.from_numpy(stats.chi.rvs(self.input_dim, size=self._num_features, random_state=self.seed)
                             /self.length_scale).to(self.float_type).to(self.device)
 
 

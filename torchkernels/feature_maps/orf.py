@@ -11,7 +11,8 @@ class ORF:
 		shape_matrix:torch.Tensor=None,
 		bias_term:bool=False, 
 		device:str=None, 
-		float_type=torch.float32):
+		float_type=torch.float32,
+		seed:int = None):
 		"""Initialize an instance of the ORF class.
 		
 		Parameters
@@ -30,6 +31,8 @@ class ORF:
 		  which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
 		float_type : torch.dtype
 		  float type to use, defaults to torch.float32.
+		seed : int
+		  seed, type int. Defaults to None.
 		"""
 		if device is None:
 			self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -40,6 +43,7 @@ class ORF:
 		self.num_features = num_features
 		self.length_scale = length_scale
 		self.float_type = float_type
+		self.seed = seed
 		
 		if shape_matrix is not None:
 			self.shape_matrix = shape_matrix.to(self.float_type)
@@ -57,12 +61,16 @@ class ORF:
 			self._num_features = self.num_features
 
 		Q_arr = []
+		Q_rv = stats.ortho_group(dim=self.input_dim, seed=self.seed)
 		for _ in range(int(np.ceil(self._num_features/self.input_dim))):
-			Q = stats.ortho_group.rvs(dim=self.input_dim)
+			Q = Q_rv.rvs()
 			Q_arr.append(Q)
 		self.Q = np.concatenate(Q_arr, axis=0)[:self._num_features].T
 		del Q_arr
 		self.Q = torch.from_numpy(self.Q).to(self.float_type).to(self.device)
+		if self.seed is not None:
+			self.torch_gen = torch.Generator(device=self.device).manual_seed(self.seed)
+		else: self.torch_gen = torch.Generator(device=self.device)
 
 		self.set_S()
 		if self.bias_term:
