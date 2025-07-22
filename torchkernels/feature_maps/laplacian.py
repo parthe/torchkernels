@@ -14,7 +14,7 @@ class LaplacianORF(ORF):
 			self.S=S
 		else:
 			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2,1/2, size=self._num_features, random_state=self.seed))/
-                             self.length_scale).to(self.float_type).to(self.device)
+                             self.length_scale).to(self.dtype).to(self.device)
    
 
 class LaplacianORF_QMC(ORF):
@@ -26,7 +26,7 @@ class LaplacianORF_QMC(ORF):
 			sampler = stats.qmc.Halton(d=1, scramble=True, seed=self.seed)
 			u = sampler.random(self._num_features).flatten()
 			samples = stats.betaprime.ppf(u, self.input_dim/2, 1/2)
-			self.S = torch.from_numpy(np.sqrt(samples)/self.length_scale).to(self.float_type).to(self.device)
+			self.S = torch.from_numpy(np.sqrt(samples)/self.length_scale).to(self.dtype).to(self.device)
 
 class LaplacianRFF(RFF):
 
@@ -35,7 +35,7 @@ class LaplacianRFF(RFF):
 			self.W2=W2
 		else:
 			
-			self.W2 = torch.randn(self._num_features, dtype=self.float_type, generator=self.torch_gen, device=self.device)
+			self.W2 = torch.randn(self._num_features, dtype=self.dtype, generator=self.torch_gen, device=self.device)
 
 	def apply_W2(self, XW1):
 		if self.bias_term:

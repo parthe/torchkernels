@@ -12,7 +12,7 @@ class GaussianORF(ORF):
 			self.S=S
 		else:
 			self.S = torch.from_numpy(stats.chi.rvs(self.input_dim, size=self._num_features, random_state=self.seed)
-                            /self.length_scale).to(self.float_type).to(self.device)
+                            /self.length_scale).to(self.dtype).to(self.device)
 
 
 class GaussianRFF(RFF):

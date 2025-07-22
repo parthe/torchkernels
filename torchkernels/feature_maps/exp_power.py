@@ -23,8 +23,8 @@ class ExpPowerORF(ORF):
 			whether to include a bias term in the random features, defaults to False.
 		device : str
 			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
-		float_type : torch.dtype
-			float type to use, defaults to torch.float64.
+		dtype : torch.dtype
+			data type to use, defaults to torch.float64.
 		alpha : float
 			stability parameter for the ExpPower kernel, must be between 0 and 2, both not included. Defaults to None.
 		seed : int
@@ -43,7 +43,7 @@ class ExpPowerORF(ORF):
 		else:
 			CMS_samples = CMS_sampling(p=self._num_features, alpha=self.alpha, length_scale=self.length_scale, seed=self.seed)
 			Chi_samples = stats.chi.rvs(self.input_dim, size=self._num_features, random_state = self.seed)
-			self.S = torch.from_numpy(np.sqrt(CMS_samples)*Chi_samples).to(self.float_type).to(self.device) 
+			self.S = torch.from_numpy(np.sqrt(CMS_samples)*Chi_samples).to(self.dtype).to(self.device) 
 
 
 class ExpPowerRFF(RFF):
@@ -64,8 +64,8 @@ class ExpPowerRFF(RFF):
 			whether to include a bias term in the random features, defaults to False.
 		device : str
 			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
-		float_type : torch.dtype
-			float type to use, defaults to torch.float64.
+		dtype : torch.dtype
+			data type to use, defaults to torch.float64.
 		alpha : float
 			stability parameter for the ExpPower kernel, must be between 0 and 2, both not included. Defaults to None.
 		seed : int
@@ -85,7 +85,7 @@ class ExpPowerRFF(RFF):
 			self.W2 = torch.from_numpy(
 				np.sqrt(
 					CMS_sampling(p=self._num_features,  alpha=self.alpha, length_scale=1., seed=self.seed)
-				)).to(self.float_type).to(self.device)
+				)).to(self.dtype).to(self.device)
 
 	def apply_W2(self, XW1):
 		if self.bias_term:

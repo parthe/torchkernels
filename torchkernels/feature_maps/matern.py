@@ -9,7 +9,6 @@ import torch
 class MaternORF(ORF):
 	def __init__(self, *args, nu:float=None, **kwargs):
 		"""Initialize an instance of the ORF class.
-		
 		Parameters
 		----------
 		input_dim : int
@@ -24,12 +23,12 @@ class MaternORF(ORF):
 			whether to include a bias term in the random features, defaults to False.
 		device : str
 			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
-		float_type : torch.dtype
-			float type to use, defaults to torch.float64.
+		dtype : torch.dtype
+			data type to use, defaults to torch.float64.
 		nu : float
 			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
 		seed : int
-		  seed, type int. Defaults to None.
+			seed, type int. Defaults to None.
 		"""
 		assert nu is not None
 		assert nu>0
@@ -42,13 +41,12 @@ class MaternORF(ORF):
 			self.S=S
 		else:
 			self.S = torch.from_numpy(np.sqrt(stats.betaprime.rvs(self.input_dim/2, self.nu, size=self._num_features, random_state = self.seed))
-                             /self.length_scale*np.sqrt(2*self.nu)).to(self.float_type).to(self.device)
+                             /self.length_scale*np.sqrt(2*self.nu)).to(self.dtype).to(self.device)
 
 
 class MaternRFF(RFF):
 	def __init__(self, *args, nu:float=None, **kwargs):
 		"""Initialize an instance of the RFF class.
-		
 		Parameters
 		----------
 		input_dim : int
@@ -63,8 +61,8 @@ class MaternRFF(RFF):
 			whether to include a bias term in the random features, defaults to False.
 		device : str
 			which device to use, can be 'cpu' or 'cuda', defaults to None which means use cuda if available.
-		float_type : torch.dtype
-			float type to use, defaults to torch.float64.
+		dtype : torch.dtype
+			data type to use, defaults to torch.float64.
 		nu : float
 			smoothness parameter for the Matern kernel, must be greater than 0. Defaults to None.
 		seed : int
@@ -81,7 +79,7 @@ class MaternRFF(RFF):
 		else:
 			df=2*self.nu
 			chi2_samples = stats.chi2.rvs(df=df, size=(self._num_features,), random_state=self.seed)/(2*self.nu)
-			self.W2 = torch.sqrt(torch.from_numpy(chi2_samples)).to(self.float_type).to(self.device)
+			self.W2 = torch.sqrt(torch.from_numpy(chi2_samples)).to(self.dtype).to(self.device)
 
 	def apply_W2(self, XW1):
 		if self.bias_term:
