@@ -1,7 +1,7 @@
 # Kernel methods in PyTorch
-Fast implementations of standard utilities 
+Fast implementations of standard utilities for kernel machines
 
-# Installation
+## Installation
 ```
 pip install -I git+https://github.com/parthe/torchkernels
 ```
@@ -11,7 +11,7 @@ Requires a PyTorch installation
 Currently this code has been tested with n=10,000 samples.\
 with Python 3.9 and `PyTorch >= 1.13`
 
-# Test installation with Laplacian kernel
+## Test installation with Laplacian kernel
 ```python
 import torch
 from torchkernels.kernels.radial import laplacian, LaplacianKernel
@@ -35,15 +35,18 @@ torch.testing.assert_close(kernel_matrix1, kernel_matrix2, msg='Laplacian test f
 print('Laplacian test complete!')
 ```
 
+# Random features
+See an example of [Logistic regression with random features of the Laplacian kernel](https://github.com/parthe/torchkernels/blob/main/demos/feature_maps/logistic_regression.ipynb).
+
 ## Currently supported Kernels
 - Laplacian, Gaussian, Dispersal (Exponential power kernel)
 - Normalized dot-product kernel for arbitrary functions
 - Neural Network Gaussian Process (NNGP) and Tangent Kernel (NTK) with ReLU activations
 
 ## Other utilities
-- top eigenvectors of kernel matrix
+- extracting top eigenvectors of a kernel matrix
 - Random feature maps for: 
-  - Gaussian
-  - Laplacian
-  - Matern
-  - Exponential-power $K(x,z) = \exp(-\|x-z\|^\gamma)$
+  - Gaussian kernel
+  - Laplacian kernel
+  - Matern kernel
+  - Exponential-power kernel $K(x,z) = \exp(-\|x-z\|^\gamma)$
