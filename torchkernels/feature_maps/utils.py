@@ -1,6 +1,6 @@
 import numpy as np
 
-def CMS_sampling(p, alpha, length_scale=1.):
+def CMS_sampling(p, alpha, length_scale=1., seed = None):
     r"""
     Generate radial CMS given alpha, length_scale and dimension d. Samples generated are from $S(\alpha/2, 1, $2 \gamma^2 (cos(\pi \alpha/2))^(2/\alpha)$, 0)
     
@@ -8,6 +8,7 @@ def CMS_sampling(p, alpha, length_scale=1.):
         p (int): Number of samples
         alpha (float): alpha for the multivariable alpha-stable distribution
         length_scale (float): length_scale for the distribution, default is 1.
+        seed (int): defaults to None. 
     
     Returns:
         x (torch.tensor), shape (n,)): generated CMS samples
@@ -18,8 +19,9 @@ def CMS_sampling(p, alpha, length_scale=1.):
     if not 0. <= alpha <= 2.:
         raise ValueError("Alpha must be between 0 and 2")
     # generate random variables
-    v = np.random.uniform(-0.5 * PI, 0.5 * PI, p)
-    w = np.random.exponential(1, p)
+    numpy_rng = np.random.default_rng(seed=seed)
+    v = numpy_rng.uniform(-0.5 * PI, 0.5 * PI, p)
+    w = numpy_rng.exponential(1, p)
     
     #alpha to be used in CMS is alpha/2 given alpha for multivariable stable distribution
     alpha = float(alpha)/2
