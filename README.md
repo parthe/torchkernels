@@ -16,12 +16,9 @@ with Python 3.9 and `PyTorch >= 1.13`
 import torch
 from torchkernels.kernels.radial import laplacian, LaplacianKernel
 
-n = 300 # number of samples
-p = 200 # number of centers
-d = 100  # dimensions
+n, p, d = 300, 200, 100 # number of samples, centers, dimensions
 
-is_cuda = torch.cuda.is_available()
-DEV = torch.device("cuda") if is_cuda else torch.device("cpu")    
+DEV = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")    
 
 X = torch.randn(n, d, device=DEV)
 Z = torch.randn(p, d, device=DEV)
@@ -41,7 +38,7 @@ import torch
 from torchkernels.kernels.radial import laplacian
 from torch.func import vmap, grad, jacrev
 
-n, p, d, c = 300, 200, 100, 3
+n, p, d, c = 300, 200, 100, 3 # number of samples, centers, dimensions, outputs
 
 DEV = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")    
 
