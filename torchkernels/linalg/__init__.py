@@ -61,7 +61,7 @@ def euclidean(samples, centers, squared=False, M=None, in_place=True):
     centers_norm2 = samples_norm2.T if (samples is centers) else norm(centers, squared=True, M=M, keepdim=False, in_place=in_place)
     
     distances = inner_product(samples, centers, M=M)
-    
+
     if in_place:
         distances.mul_(-2)
         distances.add_(samples_norm2)

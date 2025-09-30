@@ -19,7 +19,7 @@ class RadialKernel(Kernel):
     def __call__(self, samples, centers=None, M=None, **kwargs):
         if centers is None: 
             centers = samples
-        matrix = euclidean(samples, centers, squared=self.squared, M=M)
+        matrix = euclidean(samples, centers, squared=self.squared, M=M, in_place=self.in_place)
         if self.in_place:
             matrix.div_(-self.length_scale)
             # if matrix.device=='cuda': raise NotImplementedError("Currently `torch.Tensor.apply_` is not supported on CUDA")
@@ -47,7 +47,7 @@ def laplacian(samples, centers=None, length_scale=1., M=None, in_place=True):
     '''
     assert length_scale > 0
     if centers is None: centers = samples
-    kernel_mat = euclidean(samples, centers, squared=False, M=M)
+    kernel_mat = euclidean(samples, centers, squared=False, M=M, in_place=in_place)
     if in_place:
         kernel_mat.div_(-length_scale)
         kernel_mat.exp_()
@@ -62,7 +62,7 @@ def gaussian(samples, centers=None, length_scale=1., M=None, in_place=True):
     '''
     assert length_scale > 0
     if centers is None: centers = samples
-    kernel_mat = euclidean(samples, centers, squared=True, M=M)
+    kernel_mat = euclidean(samples, centers, squared=True, M=M, in_place=in_place)
     if in_place:
         kernel_mat.div_(-2 * length_scale ** 2)
         kernel_mat.exp_()
@@ -77,7 +77,7 @@ def exp_power(samples, centers=None, length_scale=1., alpha=1., M=None, in_place
     '''
     assert length_scale > 0
     if centers is None: centers = samples
-    kernel_mat = euclidean(samples, centers, squared=True, M=M)
+    kernel_mat = euclidean(samples, centers, squared=True, M=M, in_place=in_place)
     if in_place:
         kernel_mat.pow_(alpha /2.)
         kernel_mat.div_(-(length_scale**alpha))
