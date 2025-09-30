@@ -32,7 +32,7 @@ torch.testing.assert_close(kernel_matrix1, kernel_matrix2, msg='Laplacian test f
 print('Laplacian test complete!')
 ```
 
-## Example of differentiating the model
+## Example: Differentiating the kernel function
 ```python
 import torch
 from torchkernels.kernels.radial import laplacian

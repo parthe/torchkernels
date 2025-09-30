@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='torchkernels',
-    version=1.1,
+    version=1.2,
     author='Parthe Pandit',
     author_email='parthe1292@gmail.com',
     description='Primitives for Kernel Methods',
