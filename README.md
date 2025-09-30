@@ -9,7 +9,7 @@ Requires a PyTorch installation
 
 ## Stable behavior
 Currently this code has been tested with n=10,000 samples.\
-with Python 3.9 and `PyTorch >= 1.13`
+with Python 3.11 and `PyTorch >= 2.4.1`
 
 ## Test installation with Laplacian kernel
 ```python
