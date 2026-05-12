@@ -1,7 +1,7 @@
 import torch
 from ..linalg.fmm import KmV
 
-class KernelModel:
+class KernelMachine:
     def __init__(self, kernel_fn, centers, weights=None, tasks=None):
         self.kernel, self.centers = kernel_fn, centers
         self.size, self.dim = (len(centers), 1) if len(centers.shape)==1 else centers.shape
