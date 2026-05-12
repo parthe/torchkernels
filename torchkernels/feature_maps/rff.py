@@ -58,13 +58,21 @@ class RFF:
 			self.torch_gen = torch.Generator(device=self.device).manual_seed(self.seed)
 		else: 
 			self.torch_gen = torch.Generator(device=self.device)
-		self.W1 = torch.randn(self.input_dim,self._num_features,device=self.device, dtype=self.dtype, generator=self.torch_gen)
+		
+		self.init_W1()
 		self.set_W2()
 		if self.bias_term:
 			self._bias = (torch.rand(
 				self._num_features, dtype=self.dtype, generator=self.torch_gen
 			) * math.pi * 2).to(self.dtype).to(self.device)
 	
+	def init_W1(self):
+		self.W1 = torch.randn(
+			self.input_dim,
+			self._num_features,
+			device=self.device, 
+			dtype=self.dtype, 
+			generator=self.torch_gen)
 	
 	def set_W1(self, W1=None):
 		if W1 is not None:
