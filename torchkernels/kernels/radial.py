@@ -26,7 +26,7 @@ class RadialKernel(Kernel):
             matrix = self.fn(matrix)
             return matrix
         else:
-            matrix.div(-self.length_scale)
+            matrix = matrix.div(-self.length_scale)
             return self.fn(matrix)
 
 class LaplacianKernel(RadialKernel):
