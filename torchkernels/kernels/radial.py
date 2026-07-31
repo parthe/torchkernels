@@ -30,23 +30,23 @@ class RadialKernel(Kernel):
             return self.fn(matrix)
 
 class LaplacianKernel(RadialKernel):
-    def __init__(self, length_scale=1.):
-        super().__init__(fn=lambda x: torch.exp(x), length_scale=length_scale, squared=False)
+    def __init__(self, length_scale=1., **kwargs):
+        super().__init__(fn=lambda x: torch.exp(x), length_scale=length_scale, squared=False, **kwargs)
 
 class GaussianKernel(RadialKernel):
-    def __init__(self, length_scale=1.):
-        super().__init__(fn=lambda x: torch.exp(x), length_scale=length_scale, squared=True)
+    def __init__(self, length_scale=1., **kwargs):
+        super().__init__(fn=lambda x: torch.exp(x), length_scale=length_scale, squared=True, **kwargs)
     
 class ExponentialPowerKernel(RadialKernel):
-    def __init__(self, length_scale=1., power=3):
+    def __init__(self, length_scale=1., power=3, **kwargs):
         if power==1:
             raise ValueError("For power=1 use `LaplacianKernel`")
         elif power==2:
             raise ValueError("For power=1 use `GaussianKernel`")
-        super().__init__(fn=lambda x: torch.exp(torch.pow(x, power/2)), length_scale=length_scale, squared=True)
+        super().__init__(fn=lambda x: torch.exp(torch.pow(x, power/2)), length_scale=length_scale, squared=True, **kwargs)
 
 class MaternKernel(RadialKernel):
-    def __init__(self, nu=1.5, length_scale=1.):
+    def __init__(self, nu=1.5, length_scale=1., **kwargs):
         if nu == 1.5:
             fn = lambda x: (1.0 - (3.0**0.5) * x) * torch.exp((3.0**0.5) * x)
         elif nu == 2.5:
@@ -56,7 +56,7 @@ class MaternKernel(RadialKernel):
             "For nu=0.5 use `LaplacianKernel`\n"
             "For nu=inf use `GaussianKernel`")
 
-        super().__init__(fn=fn, length_scale=length_scale, squared=False)
+        super().__init__(fn=fn, length_scale=length_scale, squared=False, **kwargs)
 
 def laplacian(samples, centers=None, length_scale=1., M=None, in_place=True):
     '''
