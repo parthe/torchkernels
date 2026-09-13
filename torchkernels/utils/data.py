@@ -2,6 +2,7 @@
 
 import numpy as np
 import torch
+from typing import Optional
 
 _DTYPES = {
     str(dtype): dtype
@@ -109,16 +110,29 @@ def save_kmat(kmat: torch.Tensor, path, *, triangle=None, compress=False):
                values=packed.view(torch.uint8).numpy())
 
 
-def load_kmat(path, *, device: torch.device = torch.device("cpu")) -> torch.Tensor:
+def _default_device() -> torch.device:
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
+
+def load_kmat(path, *, device: Optional[torch.device] = None) -> torch.Tensor:
     """Load a matrix archive into a torch tensor on ``device``.
 
-    The original dtype is preserved. ``device`` is a ``torch.device``;
-    the default is CPU for portability. Full storage restores the matrix
+    The original dtype is preserved. Pass a ``torch.device`` to select the
+    destination explicitly. By default, select CUDA if available, then MPS,
+    then CPU. Availability is checked at each call. The destination must
+    support the stored dtype; use ``torch.device('cpu')`` for dtypes that
+    your accelerator does not support. Full storage restores the matrix
     as-is. Triangular storage is mirrored without conjugation and requires
     the packed CPU buffer plus the full output on the requested device.
     """
     with np.load(path, allow_pickle=False) as archive:
         shape, triangle, dtype, values = _validate_archive(archive)
+    if device is None:
+        device = _default_device()
     if values.size == 0:
         return torch.empty(shape, dtype=dtype, device=device)
     packed = torch.from_numpy(values).view(dtype)
