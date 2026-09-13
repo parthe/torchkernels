@@ -1,3 +1,16 @@
+# Testing branch policy
+
+The `testing` branch must always contain the latest `main` and remain ahead
+of it with the test files. Keep new tests on `testing`, not on `main`.
+After every update to `main`, merge `main` into `testing` and run the tests;
+do not merge testing-only commits back into `main`.
+
+Run the matrix-storage tests with:
+
+```bash
+python -m unittest torchkernels.utils.data_test -v
+```
+
 # Kernel methods in PyTorch
 Fast implementations of standard utilities for kernel machines
 
@@ -65,6 +78,28 @@ See an example of [Logistic regression with random features of the Laplacian ker
 - Neural Network Gaussian Process (NNGP) and Tangent Kernel (NTK) with ReLU activations
 
 ## Other utilities
+Save a kernel matrix from any device without changing its precision:
+
+```python
+from torchkernels.utils.data import save_kmat, load_kmat
+
+save_kmat(K, "full_kernel.npz")  # triangle=None, compress=False: store as-is
+save_kmat(K, "kernel.npz", triangle="upper", compress=True)
+K = load_kmat("kernel.npz", device=torch.device("cuda"))  # defaults to CPU
+```
+
+The default `triangle=None` preserves the full matrix, including rectangular
+and asymmetric matrices. Set `triangle="upper"` or `triangle="lower"` for
+approximately half the dense storage of a symmetric square matrix. The diagonal is
+included, so the archive holds `n*(n+1)/2` values. The chosen triangle is
+authoritative when triangular storage is selected: loading mirrors it to reconstruct a symmetric matrix (without
+complex conjugation). Symmetry is assumed rather than checked. Saving uses a
+packed CPU buffer and no full GPU copy or triangular index arrays. Loading
+needs that packed CPU buffer plus the full reconstructed matrix. Dtype is
+preserved, including `bfloat16`; gradients are not saved. `compress=False`
+(the default) uses uncompressed NPZ; `True` uses `numpy.savez_compressed`.
+Paths are used exactly as supplied, without appending an extension.
+
 - extracting top eigenvectors of a kernel matrix
 - Random feature maps for: 
   - Gaussian kernel
