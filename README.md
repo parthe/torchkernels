@@ -85,7 +85,8 @@ from torchkernels.utils.data import save_kmat, load_kmat
 
 save_kmat(K, "full_kernel.npz")  # triangle=None, compress=False: store as-is
 save_kmat(K, "kernel.npz", triangle="upper", compress=True)
-K = load_kmat("kernel.npz", device=torch.device("cuda"))  # defaults to CPU
+K = load_kmat("kernel.npz")  # CUDA if available, then MPS, then CPU
+K_cpu = load_kmat("kernel.npz", device=torch.device("cpu"))  # explicit override
 ```
 
 The default `triangle=None` preserves the full matrix, including rectangular
@@ -99,6 +100,9 @@ needs that packed CPU buffer plus the full reconstructed matrix. Dtype is
 preserved, including `bfloat16`; gradients are not saved. `compress=False`
 (the default) uses uncompressed NPZ; `True` uses `numpy.savez_compressed`.
 Paths are used exactly as supplied, without appending an extension.
+Loading chooses CUDA, then MPS, then CPU based on availability at each call.
+Pass a `torch.device` to override this choice. The selected device must support
+the saved dtype; use CPU explicitly for dtypes unsupported by your accelerator.
 
 - extracting top eigenvectors of a kernel matrix
 - Random feature maps for: 

@@ -1,12 +1,13 @@
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 
 import numpy as np
 import torch
 
-from torchkernels.utils.data import load_kmat, save_kmat, _DTYPES as DTYPES
+from torchkernels.utils.data import load_kmat, save_kmat, _DTYPES as DTYPES, _default_device
 
 
 class KmatTest(unittest.TestCase):
@@ -23,7 +24,7 @@ class KmatTest(unittest.TestCase):
                                 matrix = (base + base.T).to(dtype).T
                                 save_kmat(matrix, path, triangle=triangle,
                                           compress=compress)
-                                restored = load_kmat(path)
+                                restored = load_kmat(path, device=torch.device("cpu"))
                                 torch.testing.assert_close(restored, matrix,
                                                            rtol=0, atol=0)
                                 with np.load(path, allow_pickle=False) as archive:
@@ -44,7 +45,7 @@ class KmatTest(unittest.TestCase):
                 save_kmat(matrix, path, triangle=triangle)
                 half = matrix.triu() if triangle == "upper" else matrix.tril()
                 expected = half + half.T - matrix.diag().diag()
-                restored = load_kmat(path)
+                restored = load_kmat(path, device=torch.device("cpu"))
                 torch.testing.assert_close(restored, expected, rtol=0, atol=0)
                 self.assertFalse(restored.requires_grad)
 
@@ -53,7 +54,7 @@ class KmatTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "matrix.npz"
             save_kmat(matrix, path)
-            torch.testing.assert_close(load_kmat(path), matrix, rtol=0, atol=0)
+            torch.testing.assert_close(load_kmat(path, device=torch.device("cpu")), matrix, rtol=0, atol=0)
 
     def test_invalid_input_and_archive(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -70,7 +71,7 @@ class KmatTest(unittest.TestCase):
             np.savez(path, version=1, size=3, triangle="upper",
                      dtype="torch.float32", values=np.zeros(4, dtype=np.uint8))
             with self.assertRaisesRegex(ValueError, "Packed data"):
-                load_kmat(path)
+                load_kmat(path, device=torch.device("cpu"))
 
     @unittest.skipUnless(torch.cuda.is_available(), "CUDA is unavailable")
     def test_cuda_roundtrip(self):
@@ -108,3 +109,34 @@ class KmatTest(unittest.TestCase):
                 save_kmat(matrix, path, triangle=triangle)
                 restored = load_kmat(path, device=torch.device("mps"))
                 torch.testing.assert_close(restored, matrix, rtol=0, atol=0)
+
+    def test_device_selection(self):
+        for cuda, mps, expected in ((True, True, "cuda"), (True, False, "cuda"),
+                                    (False, True, "mps"), (False, False, "cpu")):
+            with self.subTest(cuda=cuda, mps=mps):
+                with patch("torch.cuda.is_available", return_value=cuda), patch(
+                        "torch.backends.mps.is_available", return_value=mps):
+                    self.assertEqual(_default_device(), torch.device(expected))
+
+    def test_automatic_device_and_override(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "matrix.npz"
+            for triangle in (None, "upper", "lower"):
+                matrix = torch.eye(3)
+                save_kmat(matrix, path, triangle=triangle)
+                with patch("torchkernels.utils.data._default_device",
+                           return_value=torch.device("cpu")) as select:
+                    torch.testing.assert_close(load_kmat(path), matrix)
+                    select.assert_called_once_with()
+                with patch("torchkernels.utils.data._default_device") as select:
+                    restored = load_kmat(path, device=torch.device("cpu"))
+                    torch.testing.assert_close(restored, matrix)
+                    select.assert_not_called()
+
+    def test_available_default_device_roundtrip(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "matrix.npz"
+            for triangle in (None, "upper", "lower"):
+                matrix = torch.eye(3, device=_default_device())
+                save_kmat(matrix, path, triangle=triangle)
+                torch.testing.assert_close(load_kmat(path), matrix)
