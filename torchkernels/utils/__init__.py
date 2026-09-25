@@ -3,6 +3,9 @@ from time import time
 
 from pytictoc import TicToc
 from torch.func import vmap
+from .packed import SymmetricLinearOperator
+from ..linalg.linear_operator import KernelLinearOperator
+from .multigpu_matvec import MultiGpuKernelLinearOperator
 
 timer = TicToc()
 

@@ -1,3 +1,5 @@
+from .linear_operator import KernelLinearOperator
+
 import torch
 
 eps = 1e-12
